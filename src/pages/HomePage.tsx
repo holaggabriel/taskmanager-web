@@ -1,21 +1,41 @@
 import { useState } from "react";
-import { useSelector } from "react-redux";
-import type { RootState } from "../redux/store";
+import { useSelector, useDispatch } from "react-redux";
+import type { RootState, } from "../redux/store";
+import { clearUser } from "../redux/userSlice";
 import { useNavigate } from "react-router-dom";
 import TAskList from "../components/TaskList";
 import LogoutIcon from "../assets/log-out.svg";
 import ConfirmLogoutModal from "../components/ConfirmLogoutModal";
 import DeletedTasksModal from "../components/DeletedTasksModal";
+import { persistor } from "../redux/store";
+import { authService } from "../services/authService";
+
 
 const HomePage = () => {
+  const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.user);
   const navigate = useNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeletedTasksModalOpen, setIsDeletedTasksModalOpen] = useState(false);
   const [refreshCounter, setRefreshCounter] = useState(0);
-  const handleLogout = () => {
-    navigate("/signin");
+
+  const handleLogout = async () => {
+    try {
+      // 1. Llamada al backend para eliminar cookie
+      await authService.signout();
+
+      // 2. Limpiar Redux
+      dispatch(clearUser());
+
+      // 3. Limpiar persistencia
+      await persistor.purge();
+
+      // 4. Redirigir al login
+      navigate("/signin");
+    } catch (error) {
+      console.error("Error al cerrar sesión", error);
+    }
   };
 
   const handleTasksRestored = () => {
