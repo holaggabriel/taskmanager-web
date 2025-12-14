@@ -7,7 +7,6 @@ import TrashIconFill from "../assets/trash-fill.svg";
 import PlusIcon from "../assets/plus.svg";
 import { CreateTaskModal } from "./CreateTaskModal";
 import { EditTaskModal } from "./EditTaskModal";
-import { DeleteTaskModal } from "./DeleteTaskModal";
 import SearchBar from "../components/SearchBar";
 import StatusFilter from "../components/StatusFilter";
 import * as styles from "../styles/taskListStyles";
@@ -27,6 +26,7 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
     const [editingTask, setEditingTask] = useState<Task | null>(null);
     const [deletingTask, setDeletingTask] = useState<Task | null>(null);
     const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false);
+    const [showDeleteTaskConfirm, setShowDeleteTaskConfirm] = useState(false);
     const [editingStatusId, setEditingStatusId] = useState<string | null>(null);
 
     const refreshTasks = async () => {
@@ -101,6 +101,19 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
             alert(res.message || "No se pudieron eliminar todas las tareas.");
         }
     };
+
+    const handleSoftDeleteTask = async (taskId: string) => {
+        const res = await taskService.softDeleteTaskById(taskId);
+        if (res.success) {
+            await refreshTasks(); // Refrescar la lista de tareas
+            setDeletingTask(null); // Cerrar el modal de confirmación
+            setShowDeleteTaskConfirm(false); // Cerrar el modal de confirmación de eliminar tarea
+            if (onRefresh) onRefresh(); // Ejecutar función de actualización si se pasa como prop
+        } else {
+            alert(res.message || "No se pudo eliminar la tarea.");
+        }
+    };
+
 
     const SkeletonRow = () => (
         <tr>
@@ -271,12 +284,24 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
                                                 <img src={EditIcon} alt="Editar" style={{ width: "16px", height: "16px" }} />
                                             </button>
                                             <button
-                                                onClick={() => setDeletingTask(t)}
+                                                onClick={() => {
+                                                    setDeletingTask(t); // Asignar la tarea a eliminar
+                                                    setShowDeleteTaskConfirm(true); // Mostrar el modal de confirmación
+                                                }}
                                                 style={{ ...styles.iconButtonStyle, backgroundColor: "#FFE5E5" }}
                                                 title="Eliminar"
                                             >
-                                                <img src={TrashIcon} alt="Eliminar" style={{ width: "16px", height: "16px", filter: "invert(27%) sepia(86%) saturate(2847%) hue-rotate(345deg) brightness(95%) contrast(92%)" }} />
+                                                <img
+                                                    src={TrashIcon}
+                                                    alt="Eliminar"
+                                                    style={{
+                                                        width: "16px",
+                                                        height: "16px",
+                                                        filter: "invert(27%) sepia(86%) saturate(2847%) hue-rotate(345deg) brightness(95%) contrast(92%)",
+                                                    }}
+                                                />
                                             </button>
+
                                         </div>
                                     </td>
                                 </tr>
@@ -317,6 +342,7 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
                         if (onRefresh) onRefresh();
                     }}
                 />
+
             )}
 
             {editingTask && (
@@ -329,17 +355,18 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
                         if (onRefresh) onRefresh();
                     }}
                 />
+
             )}
 
             {deletingTask && (
-                <DeleteTaskModal
-                    task={deletingTask}
-                    onClose={() => setDeletingTask(null)}
-                    onTaskDeleted={async () => {
-                        setDeletingTask(null);
-                        await refreshTasks();
-                        if (onRefresh) onRefresh();
-                    }}
+                <ConfirmationModal
+                    isOpen={showDeleteTaskConfirm} // Aquí cambiamos la variable
+                    title="Eliminar tarea"
+                    message="Esta acción moverá la tarea a la papelera de reciclaje."
+                    confirmLabel="Eliminar"
+                    cancelLabel="Cancelar"
+                    onConfirm={() => handleSoftDeleteTask(deletingTask.id)} // Usamos el nuevo método
+                    onCancel={() => setDeletingTask(null)} // Cerrar el modal sin eliminar
                 />
             )}
 
