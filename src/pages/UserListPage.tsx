@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { RootState, AppDispatch } from "../redux/store";
 import { logout } from "../redux/authSlice";
 import { useNavigate } from "react-router-dom";
-import UserList from "../components/UserList";
+// import UserList from "../components/UserList";
 import LogoutIcon from "../assets/log-out.svg";
 import ConfirmLogoutModal from "../components/ConfirmLogoutModal";
 
@@ -82,7 +82,7 @@ const UserListPage = () => {
       </div>
 
       {/* Lista de usuarios */}
-      <UserList />
+      {/* <UserList /> */}
 
       {/* Modal de confirmación */}
       <ConfirmLogoutModal

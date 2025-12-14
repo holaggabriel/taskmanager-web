@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import LoginPage from "./pages/LoginPage";
+import SignInPage from "./pages/SignInPage";
+import SignUpPage from "./pages/SignUpPage"; // nueva importación
 import UserListPage from "./pages/UserListPage";
 
 export interface RouteType {
@@ -9,6 +10,7 @@ export interface RouteType {
 }
 
 export const routes: RouteType[] = [
-  { path: "/login", element: <LoginPage /> },
+  { path: "/signin", element: <SignInPage /> },
+  { path: "/signup", element: <SignUpPage /> },
   { path: "/users", element: <UserListPage />, requiresAuth: true },
 ];

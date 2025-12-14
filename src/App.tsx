@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import LoginPage from "./pages/LoginPage";
+import SignInPage from "./pages/SignInPage";
+import SignUpPage from "./pages/SignUpPage";
 import UserListPage from "./pages/UserListPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -7,7 +8,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signin" element={<SignInPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
         <Route
           path="/users"
           element={
@@ -16,7 +18,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="*" element={<Navigate to="/login" />} />
+        <Route path="*" element={<Navigate to="/signin" />} />
       </Routes>
     </BrowserRouter>
   );

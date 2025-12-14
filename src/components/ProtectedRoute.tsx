@@ -1,14 +1,33 @@
-import { useSelector } from "react-redux";
-import type { RootState } from "../redux/store";
+import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import type { JSX } from "react";
+import { userService } from "../services/userService";
+import type { JSX } from "react/jsx-runtime";
 
-interface ProtectedRouteProps {
+interface Props {
   children: JSX.Element;
 }
 
-export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-  if (!isAuthenticated) return <Navigate to="/login" />;
+export const ProtectedRoute = ({ children }: Props) => {
+  const [loading, setLoading] = useState(true);
+  const [authenticated, setAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const verifySession = async () => {
+      try {
+        const res = await userService.getMyData();
+        setAuthenticated(res.success);
+      } catch {
+        setAuthenticated(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    verifySession();
+  }, []);
+
+  if (loading) return <p>Cargando...</p>;
+  if (!authenticated) return <Navigate to="/signin" />;
+
   return children;
 };
