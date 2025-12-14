@@ -48,7 +48,6 @@ export const filterContainerStyle: React.CSSProperties = {
 
 export const filterIconStyle: React.CSSProperties = {
     position: "absolute",
-    left: "12px",
     top: "50%",
     transform: "translateY(-50%)",
     width: "14px",

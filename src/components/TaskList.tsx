@@ -9,10 +9,10 @@ import { CreateTaskModal } from "./CreateTaskModal";
 import { EditTaskModal } from "./EditTaskModal";
 import SearchBar from "../components/SearchBar";
 import StatusFilter from "../components/StatusFilter";
-import StatusDropdown from "../components/StatusDropdown"; // Nuevo componente
+import StatusDropdown from "../components/StatusDropdown";
 import * as styles from "../styles/taskListStyles";
 import ConfirmationModal from "../components/ConfirmationModal";
-import "../styles/animations.css"; // Importa los estilos de animación
+import "../styles/animations.css";
 
 interface TaskListProps {
     refreshTrigger?: number;
