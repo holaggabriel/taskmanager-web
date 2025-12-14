@@ -12,18 +12,6 @@ export const tabsContainerStyle: React.CSSProperties = {
     marginBottom: "24px",
 };
 
-export const tabButtonStyle: React.CSSProperties = {
-    padding: "12px 24px",
-    background: "none",
-    border: "none",
-    borderBottom: "2px solid transparent",
-    fontSize: "15px",
-    fontWeight: 500,
-    cursor: "pointer",
-    transition: "all 0.2s ease",
-    color: "#666",
-};
-
 export const controlsContainerStyle: React.CSSProperties = {
     display: "flex",
     gap: "12px",
@@ -140,6 +128,21 @@ export const dangerButtonStyle: React.CSSProperties = {
     transition: "background-color 0.2s",
 };
 
+export const successButtonStyle: React.CSSProperties = {
+    padding: "10px 16px",
+    borderRadius: "8px",
+    border: "none",
+    backgroundColor: "#4CAF50", // Verde
+    color: "#fff",
+    fontSize: "14px",
+    fontWeight: 500,
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    transition: "background-color 0.2s",
+};
+
 export const iconButtonStyle: React.CSSProperties = {
     width: "32px",
     height: "32px",
@@ -231,4 +234,54 @@ export const modalStyle: React.CSSProperties = {
     width: "400px",
     maxWidth: "90%",
     boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+};
+
+export const tabsContainer: React.CSSProperties = {
+  display: "flex",
+  borderBottom: "1px solid #e0e0e0",
+  marginBottom: "24px",
+  gap: "8px",
+};
+
+// Estilos base
+export const tabButton: React.CSSProperties = {
+  padding: "12px 24px",
+  border: "none",
+  cursor: "pointer",
+  fontSize: "14px",
+  borderRadius: "6px 6px 0 0",
+  transition: "all 0.2s ease",
+  background: "transparent",
+};
+
+// Estilos para los tabs activos
+export const activeTabStyles: React.CSSProperties = {
+  backgroundColor: "#f0f7ff",
+  borderBottom: "2px solid #1976d2",
+  color: "#1976d2",
+  fontWeight: 600,
+};
+
+// Estilos para los tabs inactivos
+export const inactiveTabStyles: React.CSSProperties = {
+  backgroundColor: "transparent",
+  borderBottom: "2px solid transparent",
+  color: "#666",
+  fontWeight: 400,
+};
+
+// Estilos para el tab de tareas eliminadas (activo)
+export const deletedTabActiveStyles: React.CSSProperties = {
+  backgroundColor: "#fff5f5",
+  borderBottom: "2px solid #dc3545",
+  color: "#dc3545",
+  fontWeight: 600,
+};
+
+// Estilos para el tab de tareas eliminadas (inactivo)
+export const deletedTabInactiveStyles: React.CSSProperties = {
+  backgroundColor: "transparent",
+  borderBottom: "2px solid transparent",
+  color: "#666",
+  fontWeight: 400,
 };

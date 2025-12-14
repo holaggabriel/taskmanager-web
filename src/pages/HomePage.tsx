@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import type { RootState, } from "../redux/store";
+import type { RootState } from "../redux/store";
 import { clearUser } from "../redux/userSlice";
 import { useNavigate } from "react-router-dom";
-import TAskList from "../components/TaskList";
+import TaskList from "../components/TaskList";
+import TrashList from "../components/TrashList";
 import LogoutIcon from "../assets/log-out.svg";
 import ConfirmLogoutModal from "../components/ConfirmLogoutModal";
 import { persistor } from "../redux/store";
 import { authService } from "../services/authService";
-
+import * as styles from "../styles/taskListStyles";
 
 const HomePage = () => {
   const dispatch = useDispatch();
@@ -16,23 +17,22 @@ const HomePage = () => {
   const navigate = useNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"active" | "deleted">("active");
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const handleLogout = async () => {
     try {
-      // 1. Llamada al backend para eliminar cookie
       await authService.signout();
-
-      // 2. Limpiar Redux
       dispatch(clearUser());
-
-      // 3. Limpiar persistencia
       await persistor.purge();
-
-      // 4. Redirigir al login
       navigate("/signin");
     } catch (error) {
       console.error("Error al cerrar sesión", error);
     }
+  };
+
+  const handleRefresh = () => {
+    setRefreshTrigger(prev => prev + 1);
   };
 
   return (
@@ -40,7 +40,7 @@ const HomePage = () => {
       style={{
         padding: "20px",
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        maxWidth: "700px",
+        maxWidth: "1200px",
         margin: "20px auto",
       }}
     >
@@ -78,7 +78,6 @@ const HomePage = () => {
           </p>
         </div>
 
-
         <button
           onClick={() => setIsModalOpen(true)}
           style={{
@@ -102,8 +101,35 @@ const HomePage = () => {
         </button>
       </div>
 
-      {/* Lista de tareas */}
-      <TAskList/>
+      {/* Tabs */}
+      <div style={styles.tabsContainer}>
+        <button
+          onClick={() => setActiveTab("active")}
+          style={{
+            ...styles.tabButton,
+            ...(activeTab === "active" ? styles.activeTabStyles : styles.inactiveTabStyles),
+          }}
+        >
+          Tareas
+        </button>
+        <button
+          onClick={() => setActiveTab("deleted")}
+          style={{
+            ...styles.tabButton,
+            ...(activeTab === "deleted" ? styles.deletedTabActiveStyles : styles.deletedTabInactiveStyles),
+          }}
+        >
+          Papelera
+        </button>
+
+      </div>
+
+      {/* Contenido según tab activo */}
+      {activeTab === "active" ? (
+        <TaskList refreshTrigger={refreshTrigger} onRefresh={handleRefresh} />
+      ) : (
+        <TrashList refreshTrigger={refreshTrigger} onRefresh={handleRefresh} />
+      )}
 
       {/* Modal de confirmación logout */}
       <ConfirmLogoutModal
