@@ -66,21 +66,12 @@ export const taskService = {
         "/tasks",
         task
       );
-      console.log({
-        success: response.data.success,
-        task: response.data.data,
-        message: response.data.message
-      })
       return {
         success: response.data.success,
         task: response.data.data,
         message: response.data.message
       };
     } catch (error: any) {
-      console.log({
-        success: false,
-        message: error.response?.data?.message || "Failed to create task"
-      })
       return {
         success: false,
         message: error.response?.data?.message || "Failed to create task"

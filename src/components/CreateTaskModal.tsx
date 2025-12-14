@@ -5,7 +5,7 @@ import * as styles from "../styles/taskListStyles";
 
 type Props = {
     onClose: () => void;
-    onTaskCreated: (task: Task) => void;
+    onTaskCreated?: (task: Task) => void;
 };
 
 export const CreateTaskModal = ({ onClose, onTaskCreated }: Props) => {
@@ -32,9 +32,16 @@ export const CreateTaskModal = ({ onClose, onTaskCreated }: Props) => {
         setLoading(true);
         try {
             const response = await taskService.createTask({ title, description });
-            if (response.success && response.task) {
-                onTaskCreated(response.task);
-                onClose();
+
+            if (response.success) {
+                // Mostrar alert de éxito
+                alert("Tarea creada");
+
+                // Llamar a onTaskCreated solo si existe
+                if (onTaskCreated) {
+                    onTaskCreated(response.task || null as any);
+                }
+                onClose(); // Siempre cerramos el modal si fue exitoso
             } else {
                 alert(response.message || "No se pudo crear la tarea.");
             }

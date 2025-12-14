@@ -29,8 +29,8 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
     const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false);
     const [showDeleteTaskConfirm, setShowDeleteTaskConfirm] = useState(false);
     const [editingStatusId, setEditingStatusId] = useState<string | null>(null);
-    const [dropdownPosition, setDropdownPosition] = useState<{top: number, left: number} | null>(null);
-    const buttonRefs = useRef<{[key: string]: HTMLButtonElement}>({});
+    const [dropdownPosition, setDropdownPosition] = useState<{ top: number, left: number } | null>(null);
+    const buttonRefs = useRef<{ [key: string]: HTMLButtonElement }>({});
 
     const refreshTasks = async () => {
         setLoading(true);
@@ -67,12 +67,12 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
         try {
             const task = tasks.find(t => t.id === taskId);
             if (!task) return;
-            
+
             const response = await taskService.updateTask(taskId, {
                 ...task,
                 status: newStatus
             });
-            
+
             if (response.success) {
                 await refreshTasks();
                 if (onRefresh) onRefresh();
@@ -159,7 +159,7 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
         const target = event.target as HTMLElement;
         const isStatusButton = target.closest('button[data-action="status"]');
         const isDeleteButton = target.closest('button[data-action="delete"]');
-        
+
         if (!isStatusButton && !isDeleteButton) {
             setEditingTask(task);
         }
@@ -227,8 +227,8 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
                             Array.from({ length: 3 }).map((_, i) => <SkeletonRow key={i} />)
                         ) : filteredTasks.length > 0 ? (
                             filteredTasks.map((t) => (
-                                <tr 
-                                    key={t.id} 
+                                <tr
+                                    key={t.id}
                                     style={{
                                         ...styles.rowStyle,
                                         cursor: "pointer",
@@ -292,7 +292,7 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
                                     <td style={{ ...styles.cellStyle, color: "#666", fontSize: "13px" }}>
                                         {formatDate(t.createdAt)}
                                     </td>
-                                    <td style={{...styles.cellStyle, width: "20px", minWidth: "20", padding: "10px", }}>
+                                    <td style={{ ...styles.cellStyle, width: "20px", minWidth: "20", padding: "10px", }}>
                                         <div style={{ display: "flex", gap: "8px" }}>
                                             {/* Botón de eliminar (el de editar ya no es necesario) */}
                                             <button
@@ -359,9 +359,8 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
             {showCreateModal && (
                 <CreateTaskModal
                     onClose={() => setShowCreateModal(false)}
-                    onTaskCreated={async () => {
-                        setShowCreateModal(false);
-                        await refreshTasks();
+                    onTaskCreated={() => {
+                        refreshTasks();
                         if (onRefresh) onRefresh();
                     }}
                 />
