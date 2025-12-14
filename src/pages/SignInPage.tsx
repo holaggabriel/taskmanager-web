@@ -1,13 +1,9 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import type { AppDispatch } from "../redux/store";
-import { login } from "../redux/authSlice";
 import { useNavigate } from "react-router-dom";
 import userIcon from "../assets/user.svg";
 import { authService } from "../services/authService";
 
 const SignInPage = () => {
-  const dispatch = useDispatch<AppDispatch>();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,7 +23,6 @@ const SignInPage = () => {
       });
 
       if (response.success) {
-        dispatch(login(identifier.trim())); // guarda el identificador en Redux
         navigate("/home"); // redirige a la página protegida
       } else {
         alert(response.message || "Error al iniciar sesión");

@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import type { RootState, AppDispatch } from "../redux/store";
-import { logout } from "../redux/authSlice";
+import { useSelector } from "react-redux";
+import type { RootState } from "../redux/store";
 import { useNavigate } from "react-router-dom";
 import TAskList from "../components/TaskList";
 import LogoutIcon from "../assets/log-out.svg";
@@ -9,15 +8,13 @@ import ConfirmLogoutModal from "../components/ConfirmLogoutModal";
 import DeletedTasksModal from "../components/DeletedTasksModal";
 
 const HomePage = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { user } = useSelector((state: RootState) => state.auth);
+  const { user } = useSelector((state: RootState) => state.user);
   const navigate = useNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeletedTasksModalOpen, setIsDeletedTasksModalOpen] = useState(false);
   const [refreshCounter, setRefreshCounter] = useState(0);
   const handleLogout = () => {
-    dispatch(logout());
     navigate("/signin");
   };
 
@@ -60,10 +57,15 @@ const HomePage = () => {
           >
             Bienvenid@,
             <span style={{ marginLeft: "4px" }}>
-              <strong>{user}</strong>
+              <strong>{user?.name ?? "Not found"}</strong>
             </span>
           </p>
+          <p style={{ fontSize: "14px", color: "#555", margin: "4px 0 0 0" }}>
+            Usuario: {user?.username ?? "Not found"} | Correo: {user?.email ?? "Not found"}
+          </p>
         </div>
+
+
         <button
           onClick={() => setIsModalOpen(true)}
           style={{
