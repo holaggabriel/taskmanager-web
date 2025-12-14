@@ -21,14 +21,17 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
     const [loading, setLoading] = useState(false);
     const [showEmptyConfirm, setShowEmptyConfirm] = useState(false);
     const [showRestoreConfirm, setShowRestoreConfirm] = useState(false);
-    
+
     // Estados para modales individuales
     const [showRestoreTaskModal, setShowRestoreTaskModal] = useState(false);
     const [showDeleteTaskModal, setShowDeleteTaskModal] = useState(false);
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
     const refreshDeletedTasks = async () => {
-        setLoading(true);
+        setLoading(true);  // Activa el estado de cargando
+
+        await new Promise(resolve => setTimeout(resolve, 500));
+
         try {
             const response = await taskService.getDeletedTasks();
             if (response.success && response.tasks) {
@@ -38,9 +41,10 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
         } catch (error) {
             console.error("Error loading deleted tasks:", error);
         } finally {
-            setLoading(false);
+            setLoading(false);  // Desactiva el estado de cargando
         }
     };
+
 
     useEffect(() => {
         refreshDeletedTasks();
@@ -95,7 +99,10 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
     // Restaurar tarea individual
     const handleRestoreTask = async () => {
         if (!selectedTask) return;
-        
+
+        // Cerrar el modal primero
+        setShowRestoreTaskModal(false);
+
         const res = await taskService.restoreTaskById(selectedTask.id);
         if (res.success) {
             setDeletedTasks((prev) => prev.filter((t) => t.id !== selectedTask.id));
@@ -108,7 +115,9 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
     // Eliminar tarea individual permanentemente
     const handleDeleteTask = async () => {
         if (!selectedTask) return;
-        
+
+        // Cerrar el modal primero
+        setShowDeleteTaskModal(false);
         const res = await taskService.hardDeleteTaskById(selectedTask.id);
         if (res.success) {
             setDeletedTasks((prev) => prev.filter((t) => t.id !== selectedTask.id));
@@ -118,6 +127,7 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
     };
 
     const handleRestoreAll = async () => {
+        setShowRestoreConfirm(false);
         const res = await taskService.restoreAllTasks();
         if (res.success) {
             setDeletedTasks([]);
@@ -127,6 +137,7 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
     };
 
     const handleHardDeleteAll = async () => {
+        setShowEmptyConfirm(false);
         const res = await taskService.hardDeleteAllTasks();
         if (res.success) {
             setDeletedTasks([]);
@@ -224,12 +235,12 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
                                     <td style={{ ...styles.cellStyle, color: "#999", fontSize: "13px" }}>
                                         {task.deleted_at ? formatDate(task.deleted_at) : "-"}
                                     </td>
-                                     <td style={{...styles.cellStyle, width: "60px", minWidth: "60", padding: "10px", }}>
+                                    <td style={{ ...styles.cellStyle, width: "60px", minWidth: "60", padding: "10px", }}>
                                         <div style={{ display: "flex", gap: "8px" }}>
                                             <button
                                                 onClick={() => openRestoreTaskModal(task)}
-                                                style={{ 
-                                                    ...styles.iconButtonStyle, 
+                                                style={{
+                                                    ...styles.iconButtonStyle,
                                                     backgroundColor: "#E8F5E9",
                                                     transition: "all 0.2s ease",
                                                 }}
@@ -239,8 +250,8 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
                                             </button>
                                             <button
                                                 onClick={() => openDeleteTaskModal(task)}
-                                                style={{ 
-                                                    ...styles.iconButtonStyle, 
+                                                style={{
+                                                    ...styles.iconButtonStyle,
                                                     backgroundColor: "#FFE5E5",
                                                     transition: "all 0.2s ease",
                                                 }}

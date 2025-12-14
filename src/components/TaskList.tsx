@@ -33,7 +33,10 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
     const buttonRefs = useRef<{ [key: string]: HTMLButtonElement }>({});
 
     const refreshTasks = async () => {
-        setLoading(true);
+        setLoading(true);  // Activa el estado de cargando
+
+        await new Promise(resolve => setTimeout(resolve, 500));
+
         try {
             const response = await taskService.getTasks();
             if (response.success) {
@@ -43,9 +46,10 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
         } catch (error) {
             console.error("Error loading tasks:", error);
         } finally {
-            setLoading(false);
+            setLoading(false);  // Desactiva el estado de cargando
         }
     };
+
 
     useEffect(() => {
         refreshTasks();
@@ -126,6 +130,7 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
     };
 
     const handleSoftDeleteAll = async () => {
+        setShowDeleteAllConfirm(false);
         const res = await taskService.softDeleteAllTasks();
         if (res.success) {
             await refreshTasks();
@@ -137,6 +142,7 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
     };
 
     const handleSoftDeleteTask = async (taskId: string) => {
+        setShowDeleteTaskConfirm(false);
         const res = await taskService.softDeleteTaskById(taskId);
         if (res.success) {
             await refreshTasks();
