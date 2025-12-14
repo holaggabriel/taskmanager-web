@@ -382,8 +382,8 @@ export const authContainerStyle: React.CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   padding: "24px",
-  backgroundColor: "#F7FAFC",
   fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  overflow: "hidden"
 };
 
 export const authCardStyle: React.CSSProperties = {
@@ -525,4 +525,136 @@ export const successMessageStyle: React.CSSProperties = {
   backgroundColor: "#E8F5E9",
   color: "#2E7D32",
   border: "1px solid #C8E6C9",
+};
+
+// Estilos para página 404
+export const notFoundContainerStyle: React.CSSProperties = {
+  minHeight: "100vh",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: "24px",
+  backgroundColor: "#F7FAFC",
+  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+};
+
+export const notFoundCardStyle: React.CSSProperties = {
+  width: "100%",
+  maxWidth: "520px",
+  backgroundColor: "#fff",
+  borderRadius: "12px",
+  border: "1px solid #E2E8F0",
+  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08)",
+  padding: "48px 40px",
+  textAlign: "center",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: "24px",
+};
+
+export const notFoundIconContainer: React.CSSProperties = {
+  width: "120px",
+  height: "120px",
+  borderRadius: "50%",
+  backgroundColor: "#F0F7FF",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  marginBottom: "8px",
+  border: "1px solid #E2E8F0",
+};
+
+export const notFoundTitleStyle: React.CSSProperties = {
+  fontSize: "48px",
+  fontWeight: 700,
+  color: "#2D3748",
+  margin: "0 0 8px 0",
+  lineHeight: 1,
+};
+
+export const notFoundSubtitleStyle: React.CSSProperties = {
+  fontSize: "20px",
+  fontWeight: 500,
+  color: "#4A5568",
+  margin: "0 0 16px 0",
+};
+
+export const notFoundDescriptionStyle: React.CSSProperties = {
+  fontSize: "15px",
+  color: "#718096",
+  margin: "0 0 32px 0",
+  lineHeight: 1.6,
+  maxWidth: "380px",
+};
+
+export const notFoundErrorCodeStyle: React.CSSProperties = {
+  display: "inline-block",
+  padding: "6px 16px",
+  backgroundColor: "#F7FAFC",
+  borderRadius: "20px",
+  fontSize: "13px",
+  fontWeight: 500,
+  color: "#4A5568",
+  border: "1px solid #E2E8F0",
+  marginBottom: "24px",
+  fontFamily: "'SF Mono', 'Monaco', 'Inconsolata', monospace",
+};
+
+export const notFoundActionsStyle: React.CSSProperties = {
+  display: "flex",
+  gap: "12px",
+  flexWrap: "wrap",
+  justifyContent: "center",
+};
+
+export const notFoundSearchStyle: React.CSSProperties = {
+  position: "relative",
+  width: "100%",
+  maxWidth: "320px",
+  marginBottom: "24px",
+};
+
+export const notFoundSearchInputStyle: React.CSSProperties = {
+  ...searchInputStyle,
+  padding: "12px 16px 12px 44px",
+  fontSize: "15px",
+  borderColor: "#CBD5E0",
+};
+
+export const notFoundSearchIconStyle: React.CSSProperties = {
+  ...searchIconStyle,
+  left: "16px",
+  width: "18px",
+  height: "18px",
+  color: "#718096",
+};
+
+export const notFoundLinksContainer: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: "12px",
+  marginTop: "24px",
+};
+
+export const notFoundLinkStyle: React.CSSProperties = {
+  fontSize: "14px",
+  color: "#4CAF50",
+  textDecoration: "none",
+  cursor: "pointer",
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "6px",
+  transition: "color 0.2s",
+};
+
+export const notFoundBackgroundPattern: React.CSSProperties = {
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  pointerEvents: "none",
+  opacity: 0.1,
+  zIndex: 0,
 };
