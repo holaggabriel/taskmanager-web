@@ -226,7 +226,7 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
             {/* Modal para vaciar la papelera */}
             <ConfirmationModal
                 isOpen={showEmptyConfirm}
-                title="¿Vaciar la papelera? " // Título del modal
+                title="Vaciar la papelera" // Título del modal
                 message="Esta acción eliminará permanentemente todas las tareas. Esta acción no se puede deshacer." // Cuerpo del mensaje
                 confirmLabel="Vaciar Papelera"
                 cancelLabel="Cancelar"
@@ -237,7 +237,7 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
             {/* Modal para restaurar todas las tareas */}
             <ConfirmationModal
                 isOpen={showRestoreConfirm}
-                title="¿Restaurar todas las tareas?" // Título del modal
+                title="Restaurar todas las tareas" // Título del modal
                 message=" Esta acción restaurará todas las tareas eliminadas." // Cuerpo del mensaje
                 confirmLabel="Restaurar Todas"
                 cancelLabel="Cancelar"

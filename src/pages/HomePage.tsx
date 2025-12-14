@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import TaskList from "../components/TaskList";
 import TrashList from "../components/TrashList";
 import LogoutIcon from "../assets/log-out.svg";
-import ConfirmLogoutModal from "../components/ConfirmLogoutModal";
+import ConfirmationModal from "../components/ConfirmationModal";
 import { persistor } from "../redux/store";
 import { authService } from "../services/authService";
 import * as styles from "../styles/taskListStyles";
@@ -81,23 +81,10 @@ const HomePage = () => {
         <button
           onClick={() => setIsModalOpen(true)}
           style={{
-            padding: "10px 20px",
-            fontSize: "16px",
-            borderRadius: "8px",
-            cursor: "pointer",
-            backgroundColor: "#d32f2f",
-            color: "#fff",
-            border: "none",
-            transition: "all 0.2s",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
+            ...styles.dangerButtonStyle, 
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#b71c1c")}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#d32f2f")}
         >
-          <img src={LogoutIcon} alt="Logout" style={{ width: "18px", height: "18px" }} />
+          <img src={LogoutIcon} alt="Cerrar sesiión" style={{ width: "18px", height: "18px" }} />
         </button>
       </div>
 
@@ -131,12 +118,17 @@ const HomePage = () => {
         <TrashList refreshTrigger={refreshTrigger} onRefresh={handleRefresh} />
       )}
 
-      {/* Modal de confirmación logout */}
-      <ConfirmLogoutModal
+      <ConfirmationModal
         isOpen={isModalOpen}
+        message="¿Estás seguro de que deseas cerrar sesión?"
         onConfirm={handleLogout}
         onCancel={() => setIsModalOpen(false)}
+        confirmLabel="Sí, cerrar sesión"
+        cancelLabel="Cancelar"
+        title="Cierre de sesión"
+        isSuccessButton={false} // Puedes mantener el botón de confirmación como un botón de error (rojo)
       />
+
     </div>
   );
 };

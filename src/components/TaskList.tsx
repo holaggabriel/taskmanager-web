@@ -230,7 +230,7 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
             {/* Modal de confirmación para eliminar todo */}
             <ConfirmationModal
                 isOpen={showDeleteAllConfirm}
-                title="¿Eliminar todas las tareas? " // Título del modal
+                title="Eliminar todas las tareas" // Título del modal
                 message="Esta acción moverá todas las tareas activas a la papelera de reciclaje." // Cuerpo del mensaje
                 confirmLabel="Eliminar Todo"
                 cancelLabel="Cancelar"
