@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { taskService } from "../services/taskService";
 import type { Task } from "../types/task";
 import EditIcon from "../assets/edit.svg";
@@ -9,8 +9,10 @@ import { CreateTaskModal } from "./CreateTaskModal";
 import { EditTaskModal } from "./EditTaskModal";
 import SearchBar from "../components/SearchBar";
 import StatusFilter from "../components/StatusFilter";
+import StatusDropdown from "../components/StatusDropdown"; // Nuevo componente
 import * as styles from "../styles/taskListStyles";
 import ConfirmationModal from "../components/ConfirmationModal";
+import "../styles/animations.css"; // Importa los estilos de animación
 
 interface TaskListProps {
     refreshTrigger?: number;
@@ -28,6 +30,8 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
     const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false);
     const [showDeleteTaskConfirm, setShowDeleteTaskConfirm] = useState(false);
     const [editingStatusId, setEditingStatusId] = useState<string | null>(null);
+    const [dropdownPosition, setDropdownPosition] = useState<{top: number, left: number} | null>(null);
+    const buttonRefs = useRef<{[key: string]: HTMLButtonElement}>({});
 
     const refreshTasks = async () => {
         setLoading(true);
@@ -47,6 +51,37 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
     useEffect(() => {
         refreshTasks();
     }, [refreshTrigger]);
+
+    const handleStatusButtonClick = (taskId: string) => {
+        const button = buttonRefs.current[taskId];
+        if (button) {
+            const rect = button.getBoundingClientRect();
+            setDropdownPosition({
+                top: rect.bottom + window.scrollY,
+                left: rect.left + window.scrollX
+            });
+            setEditingStatusId(editingStatusId === taskId ? null : taskId);
+        }
+    };
+
+    const handleStatusChange = async (taskId: string, newStatus: Task["status"]) => {
+        try {
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+            
+            const response = await taskService.updateTask(taskId, {
+                ...task,
+                status: newStatus
+            });
+            
+            if (response.success) {
+                await refreshTasks();
+                if (onRefresh) onRefresh();
+            }
+        } catch {
+            alert("No se pudo actualizar el estado.");
+        }
+    };
 
     const filteredTasks = tasks
         .filter((t) => t.title.toLowerCase().includes(search.toLowerCase()))
@@ -105,15 +140,19 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
     const handleSoftDeleteTask = async (taskId: string) => {
         const res = await taskService.softDeleteTaskById(taskId);
         if (res.success) {
-            await refreshTasks(); // Refrescar la lista de tareas
-            setDeletingTask(null); // Cerrar el modal de confirmación
-            setShowDeleteTaskConfirm(false); // Cerrar el modal de confirmación de eliminar tarea
-            if (onRefresh) onRefresh(); // Ejecutar función de actualización si se pasa como prop
+            await refreshTasks();
+            setDeletingTask(null);
+            setShowDeleteTaskConfirm(false);
+            if (onRefresh) onRefresh();
         } else {
             alert(res.message || "No se pudo eliminar la tarea.");
         }
     };
 
+    const closeDropdown = () => {
+        setEditingStatusId(null);
+        setDropdownPosition(null);
+    };
 
     const SkeletonRow = () => (
         <tr>
@@ -182,7 +221,10 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
                                     <td style={styles.cellStyle}>
                                         <div style={{ position: "relative" }}>
                                             <button
-                                                onClick={() => setEditingStatusId(editingStatusId === t.id ? null : t.id)}
+                                                ref={el => {
+                                                    if (el) buttonRefs.current[t.id] = el;
+                                                }}
+                                                onClick={() => handleStatusButtonClick(t.id)}
                                                 style={{
                                                     backgroundColor: `${getStatusColor(t.status)}15`,
                                                     color: getStatusTextColor(t.status),
@@ -207,67 +249,6 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
                                                 {getStatusText(t.status)}
                                                 <span style={{ fontSize: "10px" }}>▼</span>
                                             </button>
-
-                                            {/* Dropdown */}
-                                            {editingStatusId === t.id && (
-                                                <div style={{
-                                                    position: "absolute",
-                                                    top: "100%",
-                                                    left: 0,
-                                                    marginTop: "4px",
-                                                    backgroundColor: "white",
-                                                    borderRadius: "8px",
-                                                    border: "1px solid #E2E8F0",
-                                                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                                                    zIndex: 10,
-                                                    minWidth: "160px"
-                                                }}>
-                                                    {["pending", "in_progress", "completed"].map((option) => (
-                                                        <button
-                                                            key={option}
-                                                            onClick={async () => {
-                                                                try {
-                                                                    const response = await taskService.updateTask(t.id, {
-                                                                        ...t,
-                                                                        status: option as Task["status"]
-                                                                    });
-                                                                    if (response.success) {
-                                                                        await refreshTasks();
-                                                                        setEditingStatusId(null);
-                                                                    }
-                                                                } catch {
-                                                                    alert("No se pudo actualizar el estado.");
-                                                                }
-                                                            }}
-                                                            style={{
-                                                                width: "100%",
-                                                                padding: "8px 12px",
-                                                                border: "none",
-                                                                backgroundColor: t.status === option ? `${getStatusColor(option as Task["status"])}15` : "transparent",
-                                                                color: getStatusTextColor(option as Task["status"]),
-                                                                fontSize: "13px",
-                                                                textAlign: "left",
-                                                                cursor: "pointer",
-                                                                display: "flex",
-                                                                alignItems: "center",
-                                                                gap: "8px",
-                                                                transition: "background-color 0.2s",
-                                                            }}
-                                                        >
-                                                            <div style={{
-                                                                width: "8px",
-                                                                height: "8px",
-                                                                borderRadius: "50%",
-                                                                backgroundColor: getStatusColor(option as Task["status"])
-                                                            }} />
-                                                            {getStatusText(option as Task["status"])}
-                                                            {t.status === option && (
-                                                                <span style={{ marginLeft: "auto", color: getStatusColor(option as Task["status"]) }}>✓</span>
-                                                            )}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            )}
                                         </div>
                                     </td>
 
@@ -285,8 +266,8 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
                                             </button>
                                             <button
                                                 onClick={() => {
-                                                    setDeletingTask(t); // Asignar la tarea a eliminar
-                                                    setShowDeleteTaskConfirm(true); // Mostrar el modal de confirmación
+                                                    setDeletingTask(t);
+                                                    setShowDeleteTaskConfirm(true);
                                                 }}
                                                 style={{ ...styles.iconButtonStyle, backgroundColor: "#FFE5E5" }}
                                                 title="Eliminar"
@@ -301,7 +282,6 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
                                                     }}
                                                 />
                                             </button>
-
                                         </div>
                                     </td>
                                 </tr>
@@ -320,6 +300,20 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
                     </tbody>
                 </table>
             </div>
+
+            {/* Dropdown flotante para cambiar estado */}
+            {editingStatusId && dropdownPosition && (
+                <StatusDropdown
+                    taskId={editingStatusId}
+                    taskStatus={tasks.find(t => t.id === editingStatusId)?.status || "pending"}
+                    position={dropdownPosition}
+                    onClose={closeDropdown}
+                    onStatusChange={handleStatusChange}
+                    getStatusColor={getStatusColor}
+                    getStatusTextColor={getStatusTextColor}
+                    getStatusText={getStatusText}
+                />
+            )}
 
             {/* Modal de confirmación para eliminar todo */}
             <ConfirmationModal
@@ -342,7 +336,6 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
                         if (onRefresh) onRefresh();
                     }}
                 />
-
             )}
 
             {editingTask && (
@@ -355,33 +348,19 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
                         if (onRefresh) onRefresh();
                     }}
                 />
-
             )}
 
             {deletingTask && (
                 <ConfirmationModal
-                    isOpen={showDeleteTaskConfirm} // Aquí cambiamos la variable
+                    isOpen={showDeleteTaskConfirm}
                     title="Eliminar tarea"
                     message="Esta acción moverá la tarea a la papelera de reciclaje."
                     confirmLabel="Eliminar"
                     cancelLabel="Cancelar"
-                    onConfirm={() => handleSoftDeleteTask(deletingTask.id)} // Usamos el nuevo método
-                    onCancel={() => setDeletingTask(null)} // Cerrar el modal sin eliminar
+                    onConfirm={() => handleSoftDeleteTask(deletingTask.id)}
+                    onCancel={() => setDeletingTask(null)}
                 />
             )}
-
-            <style>{`
-        .shimmer-box {
-          background: linear-gradient(90deg, #f5f5f5 25%, #e8e8e8 50%, #f5f5f5 75%);
-          background-size: 200% 100%;
-          animation: shimmer 1.5s infinite;
-          border-radius: 4px;
-        }
-        @keyframes shimmer {
-          0% { background-position: -200% 0; }
-          100% { background-position: 200% 0; }
-        }
-      `}</style>
         </div>
     );
 };
