@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import TAskList from "../components/TaskList";
 import LogoutIcon from "../assets/log-out.svg";
 import ConfirmLogoutModal from "../components/ConfirmLogoutModal";
-import DeletedTasksModal from "../components/DeletedTasksModal";
 import { persistor } from "../redux/store";
 import { authService } from "../services/authService";
 
@@ -17,8 +16,6 @@ const HomePage = () => {
   const navigate = useNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDeletedTasksModalOpen, setIsDeletedTasksModalOpen] = useState(false);
-  const [refreshCounter, setRefreshCounter] = useState(0);
 
   const handleLogout = async () => {
     try {
@@ -36,10 +33,6 @@ const HomePage = () => {
     } catch (error) {
       console.error("Error al cerrar sesión", error);
     }
-  };
-
-  const handleTasksRestored = () => {
-    setRefreshCounter((prev) => prev + 1);
   };
 
   return (
@@ -110,37 +103,13 @@ const HomePage = () => {
       </div>
 
       {/* Lista de tareas */}
-      <TAskList refreshTrigger={refreshCounter} />
+      <TAskList/>
 
       {/* Modal de confirmación logout */}
       <ConfirmLogoutModal
         isOpen={isModalOpen}
         onConfirm={handleLogout}
         onCancel={() => setIsModalOpen(false)}
-      />
-
-      {/* Botón para ver tareas eliminadas */}
-      <button
-        onClick={() => setIsDeletedTasksModalOpen(true)}
-        style={{
-          padding: "10px 20px",
-          fontSize: "16px",
-          borderRadius: "8px",
-          cursor: "pointer",
-          backgroundColor: "#1976d2",
-          color: "#fff",
-          border: "none",
-          marginTop: "20px",
-        }}
-      >
-        Ver tareas eliminadas
-      </button>
-
-      {/* Modal de tareas eliminadas */}
-      <DeletedTasksModal
-        isOpen={isDeletedTasksModalOpen}
-        onClose={() => setIsDeletedTasksModalOpen(false)}
-        onTasksRestored={handleTasksRestored}
       />
     </div>
   );

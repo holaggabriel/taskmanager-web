@@ -3,7 +3,7 @@ import { taskService } from "../services/taskService";
 import type { Task } from "../types/task";
 
 import RefreshIcon from "../assets/refresh.svg";
-import DeleteIcon from "../assets/trash.svg";
+import TrashIcon from "../assets/trash.svg";
 
 interface DeletedTasksModalProps {
   isOpen: boolean;
@@ -18,6 +18,8 @@ const DeletedTasksModal = ({
 }: DeletedTasksModalProps) => {
   const [deletedTasks, setDeletedTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<Task["status"] | "all">("all");
 
   const fetchDeletedTasks = async () => {
     setLoading(true);
@@ -25,9 +27,7 @@ const DeletedTasksModal = ({
       const res = await taskService.getDeletedTasks();
       if (res.success && res.tasks) {
         setDeletedTasks(
-          res.tasks.filter(
-            (t): t is Task => t !== undefined && t !== null
-          )
+          res.tasks.filter((t): t is Task => t !== undefined && t !== null)
         );
       }
     } finally {
@@ -84,6 +84,11 @@ const DeletedTasksModal = ({
 
   if (!isOpen) return null;
 
+  // Filtrado local
+  const filteredTasks = deletedTasks
+    .filter((t) => t.title.toLowerCase().includes(search.toLowerCase()))
+    .filter((t) => statusFilter === "all" || t.status === statusFilter);
+
   return (
     <div
       style={{
@@ -124,10 +129,31 @@ const DeletedTasksModal = ({
           ×
         </button>
 
+        {/* Búsqueda y filtro */}
+        <div style={{ display: "flex", gap: "10px", marginBottom: "15px" }}>
+          <input
+            type="text"
+            placeholder="Buscar por título..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{ flex: 1, padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
+          />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as Task["status"] | "all")}
+            style={{ padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
+          >
+            <option value="all">Todos</option>
+            <option value="pending">Pending</option>
+            <option value="in_progress">In Progress</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+
         {loading ? (
           <p>Cargando...</p>
-        ) : deletedTasks.length === 0 ? (
-          <p>No hay tareas eliminadas.</p>
+        ) : filteredTasks.length === 0 ? (
+          <p>No se encontraron tareas eliminadas.</p>
         ) : (
           <div
             style={{
@@ -137,21 +163,8 @@ const DeletedTasksModal = ({
               boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
             }}
           >
-            {/* CONTENEDOR CON SCROLL */}
-            <div
-              style={{
-                maxHeight: "50vh",
-                overflowY: "auto",
-                overflowX: "auto",
-              }}
-            >
-              <table
-                style={{
-                  width: "100%",
-                  minWidth: "900px",
-                  borderCollapse: "collapse",
-                }}
-              >
+            <div style={{ maxHeight: "50vh", overflowY: "auto", overflowX: "auto" }}>
+              <table style={{ width: "100%", minWidth: "900px", borderCollapse: "collapse" }}>
                 <thead>
                   <tr>
                     <th style={headerCellStyle}>Título</th>
@@ -162,12 +175,10 @@ const DeletedTasksModal = ({
                   </tr>
                 </thead>
                 <tbody>
-                  {deletedTasks.map((task) => (
+                  {filteredTasks.map((task) => (
                     <tr key={task.id} style={rowStyle}>
                       <td style={cellStyle}>{task.title}</td>
-                      <td style={{ ...cellStyle, color: "#555" }}>
-                        {task.description}
-                      </td>
+                      <td style={{ ...cellStyle, color: "#555" }}>{task.description}</td>
                       <td style={cellStyle}>
                         <span
                           style={{
@@ -190,9 +201,7 @@ const DeletedTasksModal = ({
                         </span>
                       </td>
                       <td style={cellStyle}>
-                        {task.deleted_at
-                          ? new Date(task.deleted_at).toLocaleString()
-                          : "-"}
+                        {task.deleted_at ? new Date(task.deleted_at).toLocaleString() : "-"}
                       </td>
                       <td style={cellStyle}>
                         <img
@@ -203,7 +212,7 @@ const DeletedTasksModal = ({
                           onClick={() => handleRestore(task.id)}
                         />
                         <img
-                          src={DeleteIcon}
+                          src={TrashIcon}
                           alt="Eliminar definitivamente"
                           title="Eliminar definitivamente"
                           style={iconStyle}
@@ -218,7 +227,7 @@ const DeletedTasksModal = ({
           </div>
         )}
 
-        {deletedTasks.length > 0 && (
+        {filteredTasks.length > 0 && (
           <div
             style={{
               marginTop: "20px",
@@ -229,7 +238,6 @@ const DeletedTasksModal = ({
             <button onClick={handleRestoreAll} style={buttonGreen}>
               Restaurar todo
             </button>
-
             <button
               onClick={handleHardDeleteAll}
               style={{ ...buttonGreen, backgroundColor: "#f44336" }}
