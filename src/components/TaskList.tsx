@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { taskService } from "../services/taskService";
 import type { Task } from "../types/task";
-import EditIcon from "../assets/edit.svg";
 import TrashIcon from "../assets/trash.svg";
 import TrashIconFill from "../assets/trash-fill.svg";
 import PlusIcon from "../assets/plus.svg";
@@ -154,6 +153,25 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
         setDropdownPosition(null);
     };
 
+    // Función para manejar el clic en la fila
+    const handleRowClick = (task: Task, event: React.MouseEvent) => {
+        // Evitar que se abra el modal si se hizo clic en los botones de estado o eliminar
+        const target = event.target as HTMLElement;
+        const isStatusButton = target.closest('button[data-action="status"]');
+        const isDeleteButton = target.closest('button[data-action="delete"]');
+        
+        if (!isStatusButton && !isDeleteButton) {
+            setEditingTask(task);
+        }
+    };
+
+    // Función para manejar la eliminación de tarea
+    const handleDeleteClick = (task: Task, event: React.MouseEvent) => {
+        event.stopPropagation(); // Evitar que se dispare el clic de la fila
+        setDeletingTask(task);
+        setShowDeleteTaskConfirm(true);
+    };
+
     const SkeletonRow = () => (
         <tr>
             {Array.from({ length: 5 }).map((_, i) => (
@@ -201,7 +219,7 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
                             <th style={styles.headerCellStyle}>Descripción</th>
                             <th style={styles.headerCellStyle}>Estado</th>
                             <th style={styles.headerCellStyle}>Creado el</th>
-                            <th style={styles.headerCellStyle}>Acciones</th>
+                            <th style={styles.headerCellStyle}></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -209,7 +227,21 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
                             Array.from({ length: 3 }).map((_, i) => <SkeletonRow key={i} />)
                         ) : filteredTasks.length > 0 ? (
                             filteredTasks.map((t) => (
-                                <tr key={t.id} style={styles.rowStyle}>
+                                <tr 
+                                    key={t.id} 
+                                    style={{
+                                        ...styles.rowStyle,
+                                        cursor: "pointer",
+                                        transition: "background-color 0.2s ease"
+                                    }}
+                                    onClick={(e) => handleRowClick(t, e)}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = "#f9fafb";
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = "";
+                                    }}
+                                >
                                     <td style={styles.cellStyle}>
                                         <div style={{ fontWeight: 500 }}>{t.title}</div>
                                     </td>
@@ -224,7 +256,11 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
                                                 ref={el => {
                                                     if (el) buttonRefs.current[t.id] = el;
                                                 }}
-                                                onClick={() => handleStatusButtonClick(t.id)}
+                                                data-action="status"
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // Evitar que se dispare el clic de la fila
+                                                    handleStatusButtonClick(t.id);
+                                                }}
                                                 style={{
                                                     backgroundColor: `${getStatusColor(t.status)}15`,
                                                     color: getStatusTextColor(t.status),
@@ -239,6 +275,7 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
                                                     gap: "6px",
                                                     transition: "all 0.2s ease",
                                                 }}
+                                                title="Cambiar estado"
                                             >
                                                 <div style={{
                                                     width: "8px",
@@ -255,20 +292,12 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
                                     <td style={{ ...styles.cellStyle, color: "#666", fontSize: "13px" }}>
                                         {formatDate(t.createdAt)}
                                     </td>
-                                    <td style={styles.cellStyle}>
+                                    <td style={{...styles.cellStyle, width: "20px", minWidth: "20", padding: "10px", }}>
                                         <div style={{ display: "flex", gap: "8px" }}>
+                                            {/* Botón de eliminar (el de editar ya no es necesario) */}
                                             <button
-                                                onClick={() => setEditingTask(t)}
-                                                style={styles.iconButtonStyle}
-                                                title="Editar"
-                                            >
-                                                <img src={EditIcon} alt="Editar" style={{ width: "16px", height: "16px" }} />
-                                            </button>
-                                            <button
-                                                onClick={() => {
-                                                    setDeletingTask(t);
-                                                    setShowDeleteTaskConfirm(true);
-                                                }}
+                                                data-action="delete"
+                                                onClick={(e) => handleDeleteClick(t, e)}
                                                 style={{ ...styles.iconButtonStyle, backgroundColor: "#FFE5E5" }}
                                                 title="Eliminar"
                                             >
@@ -358,7 +387,10 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
                     confirmLabel="Eliminar"
                     cancelLabel="Cancelar"
                     onConfirm={() => handleSoftDeleteTask(deletingTask.id)}
-                    onCancel={() => setDeletingTask(null)}
+                    onCancel={() => {
+                        setDeletingTask(null);
+                        setShowDeleteTaskConfirm(false);
+                    }}
                 />
             )}
         </div>

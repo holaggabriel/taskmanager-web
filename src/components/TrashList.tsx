@@ -180,7 +180,7 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
                             <th style={styles.headerCellStyle}>Descripción</th>
                             <th style={styles.headerCellStyle}>Estado</th>
                             <th style={styles.headerCellStyle}>Eliminado el</th>
-                            <th style={styles.headerCellStyle}>Acciones</th>
+                            <th style={styles.headerCellStyle}></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -224,7 +224,7 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
                                     <td style={{ ...styles.cellStyle, color: "#999", fontSize: "13px" }}>
                                         {task.deleted_at ? formatDate(task.deleted_at) : "-"}
                                     </td>
-                                    <td style={styles.cellStyle}>
+                                     <td style={{...styles.cellStyle, width: "60px", minWidth: "60", padding: "10px", }}>
                                         <div style={{ display: "flex", gap: "8px" }}>
                                             <button
                                                 onClick={() => openRestoreTaskModal(task)}

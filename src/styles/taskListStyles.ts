@@ -294,3 +294,83 @@ export const deletedTabInactiveStyles: React.CSSProperties = {
     color: "#666",
     fontWeight: 400,
 };
+
+// Estilos adaptados al estilo de taskListStyles
+export const modalContentStyle: React.CSSProperties = {
+    ...modalStyle,
+    maxWidth: "500px",
+};
+
+export const modalHeaderStyle: React.CSSProperties = {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "10px",
+};
+
+export const modalTitleStyle: React.CSSProperties = {
+    margin: "0",
+    color: "#333",
+    fontSize: "18px",
+    fontWeight: 600
+};
+
+export const inputStyle: React.CSSProperties = {
+    padding: "10px 12px",
+    width: "100%",
+    marginBottom: "16px",
+    borderRadius: "8px",
+    border: "1px solid #E2E8F0",
+    outline: "none",
+    boxSizing: "border-box",
+    fontSize: "14px",
+    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    transition: "border-color 0.2s",
+};
+
+export const textareaStyle: React.CSSProperties = {
+    ...inputStyle,
+    minHeight: "100px",
+    resize: "vertical",
+    marginBottom: "20px",
+    lineHeight: "1.5",
+};
+
+export const modalButtonsContainer: React.CSSProperties = {
+    display: "flex",
+    gap: "12px",
+    justifyContent: "flex-end",
+};
+
+// Nuevos estilos para modo visualización
+export const viewModeContentStyle: React.CSSProperties = {
+    padding: "8px 0",
+};
+
+export const viewFieldStyle: React.CSSProperties = {
+    marginBottom: "16px",
+};
+
+export const viewLabelStyle: React.CSSProperties = {
+    fontSize: "12px",
+    fontWeight: 600,
+    color: "#64748b",
+    textTransform: "uppercase",
+    letterSpacing: "0.05em",
+    marginBottom: "4px",
+};
+
+export const viewValueStyle: React.CSSProperties = {
+    fontSize: "14px",
+    color: "#334155",
+    padding: "8px 12px",
+    backgroundColor: "#f8fafc",
+    borderRadius: "6px",
+    border: "1px solid #e2e8f0",
+    minHeight: "20px",
+};
+
+export const placeholderStyle: React.CSSProperties = {
+    color: "#94a3b8",
+    fontStyle: "italic",
+};
