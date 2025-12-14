@@ -3,11 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 import type { RootState, AppDispatch } from "../redux/store";
 import { logout } from "../redux/authSlice";
 import { useNavigate } from "react-router-dom";
-// import UserList from "../components/UserList";
+import TAskList from "../components/TaskList";
 import LogoutIcon from "../assets/log-out.svg";
 import ConfirmLogoutModal from "../components/ConfirmLogoutModal";
 
-const UserListPage = () => {
+const HomePage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const UserListPage = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate("/login");
+    navigate("/signin");
   };
 
   return (
@@ -82,7 +82,7 @@ const UserListPage = () => {
       </div>
 
       {/* Lista de usuarios */}
-      {/* <UserList /> */}
+      <TAskList />
 
       {/* Modal de confirmación */}
       <ConfirmLogoutModal
@@ -94,4 +94,4 @@ const UserListPage = () => {
   );
 };
 
-export default UserListPage;
+export default HomePage;

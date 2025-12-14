@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
-import UserListPage from "./pages/UserListPage";
+import HomePage from "./pages/HomePage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 function App() {
@@ -14,7 +14,7 @@ function App() {
           path="/users"
           element={
             <ProtectedRoute>
-              <UserListPage />
+              <HomePage />
             </ProtectedRoute>
           }
         />
