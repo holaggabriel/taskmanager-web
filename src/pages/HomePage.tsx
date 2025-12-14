@@ -47,15 +47,7 @@ const HomePage = () => {
       {/* Header superior */}
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "15px 15px",
-          borderRadius: "7px",
-          boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
-          marginBottom: "30px",
-          flexWrap: "wrap",
-          border: "1px solid #e0e0e0",
+          ...styles.headerContainer
         }}
       >
         <div>
