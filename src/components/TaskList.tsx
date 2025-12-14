@@ -11,7 +11,11 @@ import { CreateTaskModal } from "./CreateTaskModal";
 import { EditTaskModal } from "./EditTaskModal";
 import { DeleteTaskModal } from "./DeleteTaskModal";
 
-const TaskList = () => {
+interface TaskListProps {
+    refreshTrigger?: number; // Cada vez que cambie, refresca la lista
+}
+
+const TaskList = ({ refreshTrigger }: TaskListProps) => {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(false);
@@ -25,22 +29,26 @@ const TaskList = () => {
         setLoading(true);
         setError(null);
         try {
-            const data = await taskService.getTasks();
-            // Simular pequeño delay
-            setTimeout(() => {
-                setTasks(data.filter((t): t is Task => t !== undefined && t !== null));
+            const response = await taskService.getTasks();
+            if (response.success) {
+                setTimeout(() => {
+                    setTasks((response.tasks ?? []).filter((t): t is Task => t !== undefined && t !== null));
+                    setLoading(false);
+                }, 400);
+            } else {
+                setError(response.message || "No se pudieron cargar las tareas.");
                 setLoading(false);
-            }, 400);
+            }
         } catch {
             setError("No se pudieron cargar las tareas.");
             setLoading(false);
         }
     };
 
-    // Llamar a refreshTasks al montar el componente
+    // Refresca al montar y cada vez que cambie refreshTrigger
     useEffect(() => {
         refreshTasks();
-    }, []);
+    }, [refreshTrigger]);
 
     const filteredTasks = tasks
         .filter((t): t is Task => t !== undefined && t !== null)
@@ -124,8 +132,12 @@ const TaskList = () => {
                                                 onChange={async (e) => {
                                                     const newStatus = e.target.value as Task["status"];
                                                     try {
-                                                        await taskService.updateTask(t.id, { ...t, status: newStatus });
-                                                        await refreshTasks();
+                                                        const response = await taskService.updateTask(t.id, { ...t, status: newStatus });
+                                                        if (response.success) {
+                                                            await refreshTasks();
+                                                        } else {
+                                                            alert(response.message || "No se pudo actualizar el estado.");
+                                                        }
                                                     } catch {
                                                         alert("No se pudo actualizar el estado.");
                                                     }
@@ -137,8 +149,6 @@ const TaskList = () => {
                                                 <option value="completed">Completed</option>
                                             </select>
                                         </td>
-
-
                                         <td style={cellStyle}>{formatDate(t.createdAt)}</td>
                                         <td style={cellStyle}>
                                             <img src={EditIcon} alt="Editar" title="Editar" style={iconStyle} onClick={() => setEditingTask(t)} />
@@ -158,7 +168,7 @@ const TaskList = () => {
                     onClose={() => setShowCreateModal(false)}
                     onTaskCreated={async () => {
                         setShowCreateModal(false);
-                        await refreshTasks(); // recarga la lista
+                        await refreshTasks();
                     }}
                 />
             )}
@@ -170,7 +180,7 @@ const TaskList = () => {
                     onClose={() => setEditingTask(null)}
                     onTaskUpdated={async () => {
                         setEditingTask(null);
-                        await refreshTasks(); // recarga la lista
+                        await refreshTasks();
                     }}
                 />
             )}
@@ -182,25 +192,25 @@ const TaskList = () => {
                     onClose={() => setDeletingTask(null)}
                     onTaskDeleted={async () => {
                         setDeletingTask(null);
-                        await refreshTasks(); // recarga la lista
+                        await refreshTasks();
                     }}
                 />
             )}
 
             <style>{`
-        .shimmer-box {
-          height: 24px;
-          margin: 4px;
-          border-radius: 4px;
-          background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-          background-size: 200% 100%;
-          animation: shimmer 1.5s infinite;
-        }
-        @keyframes shimmer {
-          0% { background-position: -200% 0; }
-          100% { background-position: 200% 0; }
-        }
-      `}</style>
+                .shimmer-box {
+                  height: 24px;
+                  margin: 4px;
+                  border-radius: 4px;
+                  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+                  background-size: 200% 100%;
+                  animation: shimmer 1.5s infinite;
+                }
+                @keyframes shimmer {
+                  0% { background-position: -200% 0; }
+                  100% { background-position: 200% 0; }
+                }
+            `}</style>
         </div>
     );
 };

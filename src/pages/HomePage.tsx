@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import TAskList from "../components/TaskList";
 import LogoutIcon from "../assets/log-out.svg";
 import ConfirmLogoutModal from "../components/ConfirmLogoutModal";
+import DeletedTasksModal from "../components/DeletedTasksModal";
 
 const HomePage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -13,19 +14,24 @@ const HomePage = () => {
   const navigate = useNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [isDeletedTasksModalOpen, setIsDeletedTasksModalOpen] = useState(false);
+  const [refreshCounter, setRefreshCounter] = useState(0);
   const handleLogout = () => {
     dispatch(logout());
     navigate("/signin");
   };
 
+  const handleTasksRestored = () => {
+    setRefreshCounter((prev) => prev + 1);
+  };
+
   return (
     <div
       style={{
-        padding: "40px",
+        padding: "20px",
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
         maxWidth: "700px",
-        margin: "40px auto",
+        margin: "20px auto",
       }}
     >
       {/* Header superior */}
@@ -81,14 +87,38 @@ const HomePage = () => {
         </button>
       </div>
 
-      {/* Lista de usuarios */}
-      <TAskList />
+      {/* Lista de tareas */}
+      <TAskList refreshTrigger={refreshCounter} />
 
-      {/* Modal de confirmación */}
+      {/* Modal de confirmación logout */}
       <ConfirmLogoutModal
         isOpen={isModalOpen}
         onConfirm={handleLogout}
         onCancel={() => setIsModalOpen(false)}
+      />
+
+      {/* Botón para ver tareas eliminadas */}
+      <button
+        onClick={() => setIsDeletedTasksModalOpen(true)}
+        style={{
+          padding: "10px 20px",
+          fontSize: "16px",
+          borderRadius: "8px",
+          cursor: "pointer",
+          backgroundColor: "#1976d2",
+          color: "#fff",
+          border: "none",
+          marginTop: "20px",
+        }}
+      >
+        Ver tareas eliminadas
+      </button>
+
+      {/* Modal de tareas eliminadas */}
+      <DeletedTasksModal
+        isOpen={isDeletedTasksModalOpen}
+        onClose={() => setIsDeletedTasksModalOpen(false)}
+        onTasksRestored={handleTasksRestored}
       />
     </div>
   );

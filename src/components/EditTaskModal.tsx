@@ -3,49 +3,54 @@ import type { Task } from "../types/task";
 import { taskService } from "../services/taskService";
 
 type Props = {
-  task: Task;
-  onClose: () => void;
-  onTaskUpdated: (task: Task) => void;
+    task: Task;
+    onClose: () => void;
+    onTaskUpdated: (task: Task) => void;
 };
 
 export const EditTaskModal = ({ task, onClose, onTaskUpdated }: Props) => {
-  const [editingTask, setEditingTask] = useState(task);
-  const [loading, setLoading] = useState(false);
+    const [editingTask, setEditingTask] = useState(task);
+    const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    setEditingTask(task);
-  }, [task]);
+    useEffect(() => {
+        setEditingTask(task);
+    }, [task]);
 
-  const handleUpdate = async () => {
-    if (!editingTask) return;
-    setLoading(true);
-    try {
-      const updated = await taskService.updateTask(editingTask.id, {
-        title: editingTask.title,
-        description: editingTask.description,
-      });
-      onTaskUpdated(updated);
-      onClose();
-    } catch {
-      alert("No se pudo actualizar la tarea.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const handleUpdate = async () => {
+        if (!editingTask) return;
+        setLoading(true);
+        try {
+            const response = await taskService.updateTask(editingTask.id, {
+                title: editingTask.title,
+                description: editingTask.description,
+            });
 
-  return (
-    <div style={modalOverlayStyle}>
-      <div style={modalContentStyle}>
-        <h3>Editar tarea</h3>
-        <input type="text" value={editingTask.title} onChange={e => setEditingTask({ ...editingTask, title: e.target.value })} style={inputStyle} />
-        <textarea value={editingTask.description} onChange={e => setEditingTask({ ...editingTask, description: e.target.value })} style={textareaStyle} />
-        <div style={{ textAlign: "right" }}>
-          <button onClick={onClose} style={modalButtonCancel}>Cancelar</button>
-          <button onClick={handleUpdate} disabled={loading} style={modalButtonSave}>{loading ? "Guardando..." : "Guardar"}</button>
+            if (response.success && response.task) {
+                onTaskUpdated(response.task);
+                onClose();
+            } else {
+                alert(response.message || "No se pudo actualizar la tarea.");
+            }
+        } catch {
+            alert("No se pudo actualizar la tarea.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div style={modalOverlayStyle}>
+            <div style={modalContentStyle}>
+                <h3>Editar tarea</h3>
+                <input type="text" value={editingTask.title} onChange={e => setEditingTask({ ...editingTask, title: e.target.value })} style={inputStyle} />
+                <textarea value={editingTask.description} onChange={e => setEditingTask({ ...editingTask, description: e.target.value })} style={textareaStyle} />
+                <div style={{ textAlign: "right" }}>
+                    <button onClick={onClose} style={modalButtonCancel}>Cancelar</button>
+                    <button onClick={handleUpdate} disabled={loading} style={modalButtonSave}>{loading ? "Guardando..." : "Guardar"}</button>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 const inputStyle: React.CSSProperties = { padding: "8px", width: "100%", marginBottom: "8px", borderRadius: "5px", border: "1px solid #ccc" };
