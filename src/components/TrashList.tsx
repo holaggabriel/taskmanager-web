@@ -21,6 +21,11 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
     const [loading, setLoading] = useState(false);
     const [showEmptyConfirm, setShowEmptyConfirm] = useState(false);
     const [showRestoreConfirm, setShowRestoreConfirm] = useState(false);
+    
+    // Estados para modales individuales
+    const [showRestoreTaskModal, setShowRestoreTaskModal] = useState(false);
+    const [showDeleteTaskModal, setShowDeleteTaskModal] = useState(false);
+    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
     const refreshDeletedTasks = async () => {
         setLoading(true);
@@ -75,19 +80,41 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
         }
     };
 
-    const handleRestore = async (id: string) => {
-        const res = await taskService.restoreTaskById(id);
-        if (res.success) {
-            setDeletedTasks((prev) => prev.filter((t) => t.id !== id));
-            if (onRefresh) onRefresh();
-        }
+    // Abrir modal para restaurar tarea individual
+    const openRestoreTaskModal = (task: Task) => {
+        setSelectedTask(task);
+        setShowRestoreTaskModal(true);
     };
 
-    const handleHardDelete = async (id: string) => {
-        const res = await taskService.hardDeleteTaskById(id);
+    // Abrir modal para eliminar tarea individual
+    const openDeleteTaskModal = (task: Task) => {
+        setSelectedTask(task);
+        setShowDeleteTaskModal(true);
+    };
+
+    // Restaurar tarea individual
+    const handleRestoreTask = async () => {
+        if (!selectedTask) return;
+        
+        const res = await taskService.restoreTaskById(selectedTask.id);
         if (res.success) {
-            setDeletedTasks((prev) => prev.filter((t) => t.id !== id));
+            setDeletedTasks((prev) => prev.filter((t) => t.id !== selectedTask.id));
+            if (onRefresh) onRefresh();
         }
+        setShowRestoreTaskModal(false);
+        setSelectedTask(null);
+    };
+
+    // Eliminar tarea individual permanentemente
+    const handleDeleteTask = async () => {
+        if (!selectedTask) return;
+        
+        const res = await taskService.hardDeleteTaskById(selectedTask.id);
+        if (res.success) {
+            setDeletedTasks((prev) => prev.filter((t) => t.id !== selectedTask.id));
+        }
+        setShowDeleteTaskModal(false);
+        setSelectedTask(null);
     };
 
     const handleRestoreAll = async () => {
@@ -171,7 +198,7 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
                                         </div>
                                     </td>
                                     <td style={styles.cellStyle}>
-                                        {/* Badge de estado con el mismo diseño */}
+                                        {/* Badge de estado */}
                                         <div style={{
                                             display: "inline-flex",
                                             alignItems: "center",
@@ -183,7 +210,7 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
                                             border: `1px solid ${getStatusColor(task.status)}30`,
                                             fontSize: "12px",
                                             fontWeight: 500,
-                                            opacity: 0.8 // Levemente atenuado para indicar que está en papelera
+                                            opacity: 0.8
                                         }}>
                                             <div style={{
                                                 width: "8px",
@@ -200,7 +227,7 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
                                     <td style={styles.cellStyle}>
                                         <div style={{ display: "flex", gap: "8px" }}>
                                             <button
-                                                onClick={() => handleRestore(task.id)}
+                                                onClick={() => openRestoreTaskModal(task)}
                                                 style={{ 
                                                     ...styles.iconButtonStyle, 
                                                     backgroundColor: "#E8F5E9",
@@ -211,7 +238,7 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
                                                 <img src={RefreshIcon} alt="Restaurar" style={{ width: "16px", height: "16px", filter: "invert(47%) sepia(64%) saturate(487%) hue-rotate(87deg) brightness(95%) contrast(91%)" }} />
                                             </button>
                                             <button
-                                                onClick={() => handleHardDelete(task.id)}
+                                                onClick={() => openDeleteTaskModal(task)}
                                                 style={{ 
                                                     ...styles.iconButtonStyle, 
                                                     backgroundColor: "#FFE5E5",
@@ -261,6 +288,35 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
                 onConfirm={handleRestoreAll}
                 onCancel={() => setShowRestoreConfirm(false)}
                 isSuccessButton={true}
+            />
+
+            {/* Modal para restaurar tarea individual */}
+            <ConfirmationModal
+                isOpen={showRestoreTaskModal}
+                title="Restaurar tarea"
+                message={`¿Estás seguro de que quieres restaurar la tarea "${selectedTask?.title || ''}"?`}
+                confirmLabel="Restaurar"
+                cancelLabel="Cancelar"
+                onConfirm={handleRestoreTask}
+                onCancel={() => {
+                    setShowRestoreTaskModal(false);
+                    setSelectedTask(null);
+                }}
+                isSuccessButton={true}
+            />
+
+            {/* Modal para eliminar tarea individual */}
+            <ConfirmationModal
+                isOpen={showDeleteTaskModal}
+                title="Eliminar permanentemente"
+                message={`¿Estás seguro de que quieres eliminar permanentemente la tarea "${selectedTask?.title || ''}"? Esta acción no se puede deshacer.`}
+                confirmLabel="Eliminar"
+                cancelLabel="Cancelar"
+                onConfirm={handleDeleteTask}
+                onCancel={() => {
+                    setShowDeleteTaskModal(false);
+                    setSelectedTask(null);
+                }}
             />
 
             <style>{`
