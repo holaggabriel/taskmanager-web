@@ -27,6 +27,7 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
     const [editingTask, setEditingTask] = useState<Task | null>(null);
     const [deletingTask, setDeletingTask] = useState<Task | null>(null);
     const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false);
+    const [editingStatusId, setEditingStatusId] = useState<string | null>(null);
 
     const refreshTasks = async () => {
         setLoading(true);
@@ -69,6 +70,15 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
             case "in_progress": return "#42A5F5";
             case "completed": return "#66BB6A";
             default: return "#757575";
+        }
+    };
+
+    const getStatusTextColor = (status: Task["status"]) => {
+        switch (status) {
+            case "pending": return "#B45309";
+            case "in_progress": return "#1E40AF";
+            case "completed": return "#047857";
+            default: return "#374151";
         }
     };
 
@@ -157,38 +167,97 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
                                         </div>
                                     </td>
                                     <td style={styles.cellStyle}>
-                                        <select
-                                            value={t.status}
-                                            onChange={async (e) => {
-                                                const newStatus = e.target.value as Task["status"];
-                                                try {
-                                                    const response = await taskService.updateTask(t.id, { ...t, status: newStatus });
-                                                    if (response.success) {
-                                                        await refreshTasks();
-                                                    } else {
-                                                        alert(response.message || "No se pudo actualizar el estado.");
-                                                    }
-                                                } catch {
-                                                    alert("No se pudo actualizar el estado.");
-                                                }
-                                            }}
-                                            style={{
-                                                backgroundColor: getStatusColor(t.status),
-                                                color: "#fff",
-                                                padding: "6px 12px",
-                                                borderRadius: "16px",
-                                                border: "none",
-                                                cursor: "pointer",
-                                                fontSize: "12px",
-                                                fontWeight: 500,
-                                                minWidth: "120px"
-                                            }}
-                                        >
-                                            <option value="pending">Pending</option>
-                                            <option value="in_progress">In Progress</option>
-                                            <option value="completed">Completed</option>
-                                        </select>
+                                        <div style={{ position: "relative" }}>
+                                            <button
+                                                onClick={() => setEditingStatusId(editingStatusId === t.id ? null : t.id)}
+                                                style={{
+                                                    backgroundColor: `${getStatusColor(t.status)}15`,
+                                                    color: getStatusTextColor(t.status),
+                                                    padding: "6px 12px",
+                                                    borderRadius: "16px",
+                                                    border: `1px solid ${getStatusColor(t.status)}30`,
+                                                    fontSize: "12px",
+                                                    fontWeight: 500,
+                                                    cursor: "pointer",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: "6px",
+                                                    transition: "all 0.2s ease",
+                                                }}
+                                            >
+                                                <div style={{
+                                                    width: "8px",
+                                                    height: "8px",
+                                                    borderRadius: "50%",
+                                                    backgroundColor: getStatusColor(t.status)
+                                                }} />
+                                                {getStatusText(t.status)}
+                                                <span style={{ fontSize: "10px" }}>▼</span>
+                                            </button>
+
+                                            {/* Dropdown */}
+                                            {editingStatusId === t.id && (
+                                                <div style={{
+                                                    position: "absolute",
+                                                    top: "100%",
+                                                    left: 0,
+                                                    marginTop: "4px",
+                                                    backgroundColor: "white",
+                                                    borderRadius: "8px",
+                                                    border: "1px solid #E2E8F0",
+                                                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                                                    zIndex: 10,
+                                                    minWidth: "160px"
+                                                }}>
+                                                    {["pending", "in_progress", "completed"].map((option) => (
+                                                        <button
+                                                            key={option}
+                                                            onClick={async () => {
+                                                                try {
+                                                                    const response = await taskService.updateTask(t.id, {
+                                                                        ...t,
+                                                                        status: option as Task["status"]
+                                                                    });
+                                                                    if (response.success) {
+                                                                        await refreshTasks();
+                                                                        setEditingStatusId(null);
+                                                                    }
+                                                                } catch {
+                                                                    alert("No se pudo actualizar el estado.");
+                                                                }
+                                                            }}
+                                                            style={{
+                                                                width: "100%",
+                                                                padding: "8px 12px",
+                                                                border: "none",
+                                                                backgroundColor: t.status === option ? `${getStatusColor(option as Task["status"])}15` : "transparent",
+                                                                color: getStatusTextColor(option as Task["status"]),
+                                                                fontSize: "13px",
+                                                                textAlign: "left",
+                                                                cursor: "pointer",
+                                                                display: "flex",
+                                                                alignItems: "center",
+                                                                gap: "8px",
+                                                                transition: "background-color 0.2s",
+                                                            }}
+                                                        >
+                                                            <div style={{
+                                                                width: "8px",
+                                                                height: "8px",
+                                                                borderRadius: "50%",
+                                                                backgroundColor: getStatusColor(option as Task["status"])
+                                                            }} />
+                                                            {getStatusText(option as Task["status"])}
+                                                            {t.status === option && (
+                                                                <span style={{ marginLeft: "auto", color: getStatusColor(option as Task["status"]) }}>✓</span>
+                                                            )}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
                                     </td>
+
                                     <td style={{ ...styles.cellStyle, color: "#666", fontSize: "13px" }}>
                                         {formatDate(t.createdAt)}
                                     </td>
@@ -230,8 +299,8 @@ const TaskList = ({ refreshTrigger, onRefresh }: TaskListProps) => {
             {/* Modal de confirmación para eliminar todo */}
             <ConfirmationModal
                 isOpen={showDeleteAllConfirm}
-                title="Eliminar todas las tareas" // Título del modal
-                message="Esta acción moverá todas las tareas activas a la papelera de reciclaje." // Cuerpo del mensaje
+                title="Eliminar todas las tareas"
+                message="Esta acción moverá todas las tareas activas a la papelera de reciclaje."
                 confirmLabel="Eliminar Todo"
                 cancelLabel="Cancelar"
                 onConfirm={handleSoftDeleteAll}

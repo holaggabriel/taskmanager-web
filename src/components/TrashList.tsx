@@ -20,7 +20,7 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
     const [statusFilter, setStatusFilter] = useState<Task["status"] | "all">("all");
     const [loading, setLoading] = useState(false);
     const [showEmptyConfirm, setShowEmptyConfirm] = useState(false);
-    const [showRestoreConfirm, setShowRestoreConfirm] = useState(false); // Nuevo estado
+    const [showRestoreConfirm, setShowRestoreConfirm] = useState(false);
 
     const refreshDeletedTasks = async () => {
         setLoading(true);
@@ -96,7 +96,7 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
             setDeletedTasks([]);
             if (onRefresh) onRefresh();
         }
-        setShowRestoreConfirm(false); // Cerrar el modal después de restaurar
+        setShowRestoreConfirm(false);
     };
 
     const handleHardDeleteAll = async () => {
@@ -127,7 +127,7 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
                 {deletedTasks.length > 0 && (
                     <div style={styles.actionsContainerStyle}>
                         <button
-                            onClick={() => setShowRestoreConfirm(true)} // Mostrar modal de confirmación
+                            onClick={() => setShowRestoreConfirm(true)}
                             style={styles.secondaryButtonStyle}
                             title="Restaurar todas las tareas"
                         >
@@ -171,19 +171,28 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
                                         </div>
                                     </td>
                                     <td style={styles.cellStyle}>
-                                        <span
-                                            style={{
-                                                backgroundColor: getStatusColor(task.status),
-                                                color: "#fff",
-                                                padding: "4px 12px",
-                                                borderRadius: "16px",
-                                                fontSize: "12px",
-                                                fontWeight: 500,
-                                                display: "inline-block"
-                                            }}
-                                        >
+                                        {/* Badge de estado con el mismo diseño */}
+                                        <div style={{
+                                            display: "inline-flex",
+                                            alignItems: "center",
+                                            gap: "6px",
+                                            backgroundColor: `${getStatusColor(task.status)}15`,
+                                            color: getStatusColor(task.status),
+                                            padding: "6px 12px",
+                                            borderRadius: "16px",
+                                            border: `1px solid ${getStatusColor(task.status)}30`,
+                                            fontSize: "12px",
+                                            fontWeight: 500,
+                                            opacity: 0.8 // Levemente atenuado para indicar que está en papelera
+                                        }}>
+                                            <div style={{
+                                                width: "8px",
+                                                height: "8px",
+                                                borderRadius: "50%",
+                                                backgroundColor: getStatusColor(task.status)
+                                            }} />
                                             {getStatusText(task.status)}
-                                        </span>
+                                        </div>
                                     </td>
                                     <td style={{ ...styles.cellStyle, color: "#999", fontSize: "13px" }}>
                                         {task.deleted_at ? formatDate(task.deleted_at) : "-"}
@@ -192,14 +201,22 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
                                         <div style={{ display: "flex", gap: "8px" }}>
                                             <button
                                                 onClick={() => handleRestore(task.id)}
-                                                style={{ ...styles.iconButtonStyle, backgroundColor: "#E8F5E9" }}
+                                                style={{ 
+                                                    ...styles.iconButtonStyle, 
+                                                    backgroundColor: "#E8F5E9",
+                                                    transition: "all 0.2s ease",
+                                                }}
                                                 title="Restaurar"
                                             >
                                                 <img src={RefreshIcon} alt="Restaurar" style={{ width: "16px", height: "16px", filter: "invert(47%) sepia(64%) saturate(487%) hue-rotate(87deg) brightness(95%) contrast(91%)" }} />
                                             </button>
                                             <button
                                                 onClick={() => handleHardDelete(task.id)}
-                                                style={{ ...styles.iconButtonStyle, backgroundColor: "#FFE5E5" }}
+                                                style={{ 
+                                                    ...styles.iconButtonStyle, 
+                                                    backgroundColor: "#FFE5E5",
+                                                    transition: "all 0.2s ease",
+                                                }}
                                                 title="Eliminar permanentemente"
                                             >
                                                 <img src={TrashIcon} alt="Eliminar" style={{ width: "16px", height: "16px", filter: "invert(27%) sepia(86%) saturate(2847%) hue-rotate(345deg) brightness(95%) contrast(92%)" }} />
@@ -226,8 +243,8 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
             {/* Modal para vaciar la papelera */}
             <ConfirmationModal
                 isOpen={showEmptyConfirm}
-                title="Vaciar la papelera" // Título del modal
-                message="Esta acción eliminará permanentemente todas las tareas. Esta acción no se puede deshacer." // Cuerpo del mensaje
+                title="Vaciar la papelera"
+                message="Esta acción eliminará permanentemente todas las tareas. Esta acción no se puede deshacer."
                 confirmLabel="Vaciar Papelera"
                 cancelLabel="Cancelar"
                 onConfirm={handleHardDeleteAll}
@@ -237,15 +254,14 @@ const TrashList = ({ refreshTrigger, onRefresh }: TrashListProps) => {
             {/* Modal para restaurar todas las tareas */}
             <ConfirmationModal
                 isOpen={showRestoreConfirm}
-                title="Restaurar todas las tareas" // Título del modal
-                message=" Esta acción restaurará todas las tareas eliminadas." // Cuerpo del mensaje
+                title="Restaurar todas las tareas"
+                message="Esta acción restaurará todas las tareas eliminadas."
                 confirmLabel="Restaurar Todas"
                 cancelLabel="Cancelar"
                 onConfirm={handleRestoreAll}
                 onCancel={() => setShowRestoreConfirm(false)}
                 isSuccessButton={true}
             />
-
 
             <style>{`
         .shimmer-box {
