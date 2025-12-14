@@ -374,3 +374,155 @@ export const placeholderStyle: React.CSSProperties = {
     color: "#94a3b8",
     fontStyle: "italic",
 };
+
+// Estilos para páginas de autenticación
+export const authContainerStyle: React.CSSProperties = {
+  minHeight: "100vh",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: "24px",
+  backgroundColor: "#F7FAFC",
+  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+};
+
+export const authCardStyle: React.CSSProperties = {
+  width: "100%",
+  maxWidth: "440px",
+  backgroundColor: "#fff",
+  borderRadius: "12px",
+  border: "1px solid #E2E8F0",
+  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+  padding: "40px 32px",
+  display: "flex",
+  flexDirection: "column",
+  gap: "24px",
+};
+
+export const authHeaderStyle: React.CSSProperties = {
+  textAlign: "center",
+  marginBottom: "8px",
+};
+
+export const authTitleStyle: React.CSSProperties = {
+  fontSize: "24px",
+  fontWeight: 600,
+  color: "#2D3748",
+  margin: "0 0 8px 0",
+};
+
+export const authSubtitleStyle: React.CSSProperties = {
+  fontSize: "14px",
+  color: "#718096",
+  margin: 0,
+};
+
+export const authFormStyle: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: "20px",
+};
+
+export const authInputGroupStyle: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: "4px",
+};
+
+export const authLabelStyle: React.CSSProperties = {
+  fontSize: "13px",
+  fontWeight: 500,
+  color: "#4A5568",
+  marginBottom: "4px",
+};
+
+export const authInputStyle: React.CSSProperties = {
+  padding: "12px 16px",
+  fontSize: "14px",
+  width: "100%",
+  borderRadius: "8px",
+  border: "1px solid #E2E8F0",
+  outline: "none",
+  boxSizing: "border-box",
+  transition: "border-color 0.2s, box-shadow 0.2s",
+  backgroundColor: "#fff",
+  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+};
+
+export const authInputIconStyle: React.CSSProperties = {
+  position: "absolute",
+  left: "16px",
+  top: "50%",
+  transform: "translateY(-50%)",
+  width: "16px",
+  height: "16px",
+  color: "#A0AEC0",
+  pointerEvents: "none",
+};
+
+export const authInputWrapperStyle: React.CSSProperties = {
+  position: "relative",
+  display: "flex",
+  alignItems: "center",
+};
+
+export const authButtonStyle: React.CSSProperties = {
+  ...primaryButtonStyle,
+  width: "100%",
+  padding: "14px 24px",
+  fontSize: "15px",
+  fontWeight: 500,
+  borderRadius: "8px",
+  marginTop: "8px",
+};
+
+export const authDividerStyle: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  textAlign: "center",
+  margin: "16px 0",
+  color: "#A0AEC0",
+  fontSize: "13px",
+};
+
+export const authDividerLineStyle: React.CSSProperties = {
+  flex: 1,
+  height: "1px",
+  backgroundColor: "#E2E8F0",
+};
+
+export const authDividerTextStyle: React.CSSProperties = {
+  padding: "0 16px",
+  color: "#718096",
+  fontSize: "13px",
+};
+
+export const authFooterStyle: React.CSSProperties = {
+  textAlign: "center",
+  marginTop: "8px",
+  fontSize: "14px",
+  color: "#718096",
+};
+
+export const authLinkStyle: React.CSSProperties = {
+  color: "#4CAF50",
+  fontWeight: 500,
+  cursor: "pointer",
+  textDecoration: "none",
+  transition: "color 0.2s",
+};
+
+export const errorMessageStyle: React.CSSProperties = {
+  ...errorStyle,
+  marginTop: "16px",
+  marginBottom: 0,
+  padding: "10px 14px",
+  fontSize: "13px",
+};
+
+export const successMessageStyle: React.CSSProperties = {
+  ...errorMessageStyle,
+  backgroundColor: "#E8F5E9",
+  color: "#2E7D32",
+  border: "1px solid #C8E6C9",
+};

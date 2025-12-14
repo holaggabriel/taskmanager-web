@@ -1,7 +1,26 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../services/authService";
-import userIcon from "../assets/user.svg";
+import {
+  authContainerStyle,
+  authCardStyle,
+  authHeaderStyle,
+  authTitleStyle,
+  authSubtitleStyle,
+  authFormStyle,
+  authInputGroupStyle,
+  authLabelStyle,
+  authInputStyle,
+  authInputWrapperStyle,
+  authButtonStyle,
+  authDividerStyle,
+  authDividerLineStyle,
+  authDividerTextStyle,
+  authFooterStyle,
+  authLinkStyle,
+  errorMessageStyle,
+  successMessageStyle,
+} from "../styles/taskListStyles";
 
 const SignUpPage = () => {
   const [name, setName] = useState("");
@@ -9,15 +28,27 @@ const SignUpPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
   const handleSignUp = async () => {
     if (!name.trim() || !username.trim() || !email.trim() || !password.trim()) {
-      alert("Por favor, completa todos los campos");
+      setError("Por favor, completa todos los campos");
       return;
     }
 
+    // Validación básica de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setError("Por favor, ingresa un correo electrónico válido");
+      return;
+    }
+
+    setError("");
+    setSuccess("");
     setLoading(true);
+
     try {
       const response = await authService.signup({
         name: name.trim(),
@@ -27,14 +58,16 @@ const SignUpPage = () => {
       });
 
       if (response.success) {
-        alert("Registro exitoso, ya puedes iniciar sesión");
-        navigate("/signin"); // redirige al login
+        setSuccess("Registro exitoso. Redirigiendo al inicio de sesión...");
+        setTimeout(() => {
+          navigate("/signin");
+        }, 2000);
       } else {
-        alert(response.message || "Error al registrarse");
+        setError(response.message || "Error al registrarse");
       }
     } catch (error: any) {
       console.error(error);
-      alert(
+      setError(
         error.response?.data?.message || "Error en la conexión con el servidor"
       );
     } finally {
@@ -42,137 +75,148 @@ const SignUpPage = () => {
     }
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSignUp();
+    }
+  };
+
   return (
-    <div
-      style={{
-        padding: "40px",
-        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        maxWidth: "400px",
-        margin: "80px auto",
-        textAlign: "center",
-        border: "1px solid #e0e0e0",
-        borderRadius: "7px",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
-      }}
-    >
-      <h1 style={{ marginBottom: "20px" }}>Registro</h1>
+    <div style={authContainerStyle}>
+      <div style={authCardStyle}>
+        <div style={authHeaderStyle}>
+          <h1 style={authTitleStyle}>Crear Cuenta</h1>
+          <p style={authSubtitleStyle}>
+            Regístrate para empezar a usar la aplicación
+          </p>
+        </div>
 
-      <div style={{ position: "relative", marginBottom: "20px" }}>
-        <img
-          src={userIcon}
-          alt="Usuario"
-          style={{
-            position: "absolute",
-            left: "10px",
-            top: "50%",
-            transform: "translateY(-50%)",
-            width: "18px",
-            height: "18px",
-          }}
-        />
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Nombre completo"
-          style={{
-            padding: "10px 10px 10px 40px",
-            fontSize: "16px",
-            width: "100%",
-            borderRadius: "7px",
-            border: "1px solid #ccc",
-            outline: "none",
-            boxSizing: "border-box",
-            marginBottom: "10px",
-          }}
-        />
-        <input
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="Nombre de usuario"
-          style={{
-            padding: "10px 10px 10px 40px",
-            fontSize: "16px",
-            width: "100%",
-            borderRadius: "7px",
-            border: "1px solid #ccc",
-            outline: "none",
-            boxSizing: "border-box",
-            marginBottom: "10px",
-          }}
-        />
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Correo electrónico"
-          style={{
-            padding: "10px 10px 10px 40px",
-            fontSize: "16px",
-            width: "100%",
-            borderRadius: "7px",
-            border: "1px solid #ccc",
-            outline: "none",
-            boxSizing: "border-box",
-            marginBottom: "10px",
-          }}
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Contraseña"
-          style={{
-            padding: "10px 10px 10px 40px",
-            fontSize: "16px",
-            width: "100%",
-            borderRadius: "7px",
-            border: "1px solid #ccc",
-            outline: "none",
-            boxSizing: "border-box",
-            marginBottom: "10px",
-          }}
-        />
+        {error && (
+          <div style={errorMessageStyle}>
+            {error}
+          </div>
+        )}
+
+        {success && (
+          <div style={successMessageStyle}>
+            {success}
+          </div>
+        )}
+
+        <div style={authFormStyle}>
+          <div style={authInputGroupStyle}>
+            <label style={authLabelStyle}>Nombre Completo</label>
+            <div style={authInputWrapperStyle}>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Juan Pérez"
+                style={authInputStyle}
+                onKeyPress={handleKeyPress}
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          <div style={authInputGroupStyle}>
+            <label style={authLabelStyle}>Nombre de Usuario</label>
+            <div style={authInputWrapperStyle}>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="juanperez"
+                style={authInputStyle}
+                onKeyPress={handleKeyPress}
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          <div style={authInputGroupStyle}>
+            <label style={authLabelStyle}>Correo Electrónico</label>
+            <div style={authInputWrapperStyle}>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="tu@correo.com"
+                style={authInputStyle}
+                onKeyPress={handleKeyPress}
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          <div style={authInputGroupStyle}>
+            <label style={authLabelStyle}>Contraseña</label>
+            <div style={authInputWrapperStyle}>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                style={authInputStyle}
+                onKeyPress={handleKeyPress}
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={handleSignUp}
+            disabled={loading}
+            style={{
+              ...authButtonStyle,
+              opacity: loading ? 0.7 : 1,
+              cursor: loading ? "not-allowed" : "pointer",
+            }}
+            onMouseEnter={(e) => {
+              if (!loading) {
+                e.currentTarget.style.backgroundColor = "#45a049";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!loading) {
+                e.currentTarget.style.backgroundColor = "#4CAF50";
+              }
+            }}
+          >
+            {loading ? (
+              <>
+                Registrando...
+              </>
+            ) : (
+              "Crear Cuenta"
+            )}
+          </button>
+        </div>
+
+        <div style={authDividerStyle}>
+          <div style={authDividerLineStyle} />
+          <span style={authDividerTextStyle}>¿Ya tienes cuenta?</span>
+          <div style={authDividerLineStyle} />
+        </div>
+
+        <div style={authFooterStyle}>
+          <p>
+            Inicia sesión{" "}
+            <span
+              style={authLinkStyle}
+              onClick={() => navigate("/signin")}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = "#388e3c";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = "#4CAF50";
+              }}
+            >
+              aquí
+            </span>
+          </p>
+        </div>
       </div>
-
-      <button
-        onClick={handleSignUp}
-        disabled={loading}
-        style={{
-          padding: "12px 24px",
-          fontSize: "16px",
-          borderRadius: "7px",
-          cursor: "pointer",
-          backgroundColor: "#1976d2",
-          color: "#fff",
-          border: "none",
-          transition: "background-color 0.2s",
-          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-        }}
-        onMouseEnter={(e) =>
-          (e.currentTarget.style.backgroundColor = "#1565c0")
-        }
-        onMouseLeave={(e) =>
-          (e.currentTarget.style.backgroundColor = "#1976d2")
-        }
-      >
-        {loading ? "Registrando..." : "Registrarse"}
-      </button>
-
-      <p style={{ marginTop: "20px" }}>
-        ¿Ya tienes cuenta?{" "}
-        <span
-          style={{
-            color: "#1976d2",
-            cursor: "pointer",
-            textDecoration: "underline",
-          }}
-          onClick={() => navigate("/signin")}
-        >
-          Inicia sesión
-        </span>
-      </p>
     </div>
   );
 };

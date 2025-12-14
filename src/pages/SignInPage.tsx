@@ -1,20 +1,40 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import userIcon from "../assets/user.svg";
 import { authService } from "../services/authService";
+import {
+  authContainerStyle,
+  authCardStyle,
+  authHeaderStyle,
+  authTitleStyle,
+  authSubtitleStyle,
+  authFormStyle,
+  authInputGroupStyle,
+  authLabelStyle,
+  authInputStyle,
+  authInputWrapperStyle,
+  authButtonStyle,
+  authDividerStyle,
+  authDividerLineStyle,
+  authDividerTextStyle,
+  authFooterStyle,
+  authLinkStyle,
+  errorMessageStyle,
+} from "../styles/taskListStyles";
 
 const SignInPage = () => {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async () => {
     if (identifier.trim() === "" || password.trim() === "") {
-      alert("Por favor, ingresa tu usuario o correo y contraseña");
+      setError("Por favor, ingresa tu usuario o correo y contraseña");
       return;
     }
 
+    setError("");
     setLoading(true);
     try {
       const response = await authService.signin({
@@ -23,13 +43,13 @@ const SignInPage = () => {
       });
 
       if (response.success) {
-        navigate("/home"); // redirige a la página protegida
+        navigate("/home");
       } else {
-        alert(response.message || "Error al iniciar sesión");
+        setError(response.message || "Error al iniciar sesión");
       }
     } catch (error: any) {
       console.error(error);
-      alert(
+      setError(
         error.response?.data?.message || "Error en la conexión con el servidor"
       );
     } finally {
@@ -37,104 +57,114 @@ const SignInPage = () => {
     }
   };
 
-  
-return (
-  <div
-    style={{
-      padding: "40px",
-      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-      maxWidth: "400px",
-      margin: "80px auto",
-      textAlign: "center",
-      border: "1px solid #e0e0e0",
-      borderRadius: "7px",
-      boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
-    }}
-  >
-    <h1 style={{ marginBottom: "20px" }}>Iniciar sesión</h1>
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleLogin();
+    }
+  };
 
-    <div style={{ position: "relative", marginBottom: "20px" }}>
-      <img
-        src={userIcon}
-        alt="Usuario"
-        style={{
-          position: "absolute",
-          left: "10px",
-          top: "50%",
-          transform: "translateY(-50%)",
-          width: "18px",
-          height: "18px",
-        }}
-      />
-      <input
-        type="text"
-        value={identifier}
-        onChange={(e) => setIdentifier(e.target.value)}
-        placeholder="Usuario o correo"
-        style={{
-          padding: "10px 10px 10px 40px",
-          fontSize: "16px",
-          width: "100%",
-          borderRadius: "7px",
-          border: "1px solid #ccc",
-          outline: "none",
-          boxSizing: "border-box",
-          marginBottom: "10px",
-        }}
-      />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Contraseña"
-        style={{
-          padding: "10px",
-          fontSize: "16px",
-          width: "100%",
-          borderRadius: "7px",
-          border: "1px solid #ccc",
-          outline: "none",
-          boxSizing: "border-box",
-        }}
-      />
+  return (
+    <div style={authContainerStyle}>
+      <div style={authCardStyle}>
+        <div style={authHeaderStyle}>
+          <h1 style={authTitleStyle}>Iniciar Sesión</h1>
+          <p style={authSubtitleStyle}>
+            Ingresa tus credenciales para acceder a tu cuenta
+          </p>
+        </div>
+
+        {error && (
+          <div style={errorMessageStyle}>
+            {error}
+          </div>
+        )}
+
+        <div style={authFormStyle}>
+          <div style={authInputGroupStyle}>
+            <label style={authLabelStyle}>Usuario o Correo</label>
+            <div style={authInputWrapperStyle}>
+              <input
+                type="text"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                placeholder="usuario@ejemplo.com"
+                style={authInputStyle}
+                onKeyPress={handleKeyPress}
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          <div style={authInputGroupStyle}>
+            <label style={authLabelStyle}>Contraseña</label>
+            <div style={authInputWrapperStyle}>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                style={authInputStyle}
+                onKeyPress={handleKeyPress}
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={handleLogin}
+            disabled={loading}
+            style={{
+              ...authButtonStyle,
+              opacity: loading ? 0.7 : 1,
+              cursor: loading ? "not-allowed" : "pointer",
+            }}
+            onMouseEnter={(e) => {
+              if (!loading) {
+                e.currentTarget.style.backgroundColor = "#45a049";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!loading) {
+                e.currentTarget.style.backgroundColor = "#4CAF50";
+              }
+            }}
+          >
+            {loading ? (
+              <>
+                Ingresando...
+              </>
+            ) : (
+              "Iniciar Sesión"
+            )}
+          </button>
+        </div>
+
+        <div style={authDividerStyle}>
+          <div style={authDividerLineStyle} />
+          <span style={authDividerTextStyle}>¿No tienes cuenta?</span>
+          <div style={authDividerLineStyle} />
+        </div>
+
+        <div style={authFooterStyle}>
+          <p>
+            Crea una cuenta{" "}
+            <span
+              style={authLinkStyle}
+              onClick={() => navigate("/signup")}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = "#388e3c";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = "#4CAF50";
+              }}
+            >
+              aquí
+            </span>
+          </p>
+        </div>
+      </div>
     </div>
-
-    <button
-      onClick={handleLogin}
-      disabled={loading}
-      style={{
-        padding: "12px 24px",
-        fontSize: "16px",
-        borderRadius: "7px",
-        cursor: "pointer",
-        backgroundColor: "#1976d2",
-        color: "#fff",
-        border: "none",
-        transition: "background-color 0.2s",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-      }}
-      onMouseEnter={(e) =>
-        (e.currentTarget.style.backgroundColor = "#1565c0")
-      }
-      onMouseLeave={(e) =>
-        (e.currentTarget.style.backgroundColor = "#1976d2")
-      }
-    >
-      {loading ? "Ingresando..." : "Iniciar sesión"}
-    </button>
-
-    {/* Enlace a la página de registro */}
-    <p style={{ marginTop: "20px" }}>
-      ¿No tienes cuenta?{" "}
-      <span
-        style={{ color: "#1976d2", cursor: "pointer", textDecoration: "underline" }}
-        onClick={() => navigate("/signup")}
-      >
-        Regístrate aquí
-      </span>
-    </p>
-  </div>
-);
+  );
 };
 
 export default SignInPage;
