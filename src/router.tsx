@@ -12,5 +12,5 @@ export interface RouteType {
 export const routes: RouteType[] = [
   { path: "/signin", element: <SignInPage /> },
   { path: "/signup", element: <SignUpPage /> },
-  { path: "/users", element: <HomePage />, requiresAuth: true },
+  { path: "/home", element: <HomePage />, requiresAuth: true },
 ];

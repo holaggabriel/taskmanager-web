@@ -28,7 +28,7 @@ const SignInPage = () => {
 
       if (response.success) {
         dispatch(login(identifier.trim())); // guarda el identificador en Redux
-        navigate("/users"); // redirige a la página protegida
+        navigate("/home"); // redirige a la página protegida
       } else {
         alert(response.message || "Error al iniciar sesión");
       }

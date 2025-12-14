@@ -26,7 +26,7 @@ export const ProtectedRoute = ({ children }: Props) => {
     verifySession();
   }, []);
 
-  if (loading) return <p>Cargando...</p>;
+  if (loading) return <p></p>;
   if (!authenticated) return <Navigate to="/signin" />;
 
   return children;
