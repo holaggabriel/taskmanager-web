@@ -95,11 +95,9 @@ const StatusFilter = ({
                     fontWeight: 500,
                     cursor: "pointer",
                     transition: "all 0.2s",
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+
                     justifyContent: "space-between"
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 4px 6px rgba(0,0,0,0.1)"}
-                onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)"}
             >
                 <div style={{ display: "flex", alignItems: "center" }}>
                     <img src={FilterIcon} alt="Filtrar" style={{...styles.filterIconStyle}} />

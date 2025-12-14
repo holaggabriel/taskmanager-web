@@ -179,14 +179,16 @@ export const headerContainer: React.CSSProperties = {
 export const tableContainerStyle: React.CSSProperties = {
     border: "1px solid #E2E8F0",
     borderRadius: "12px",
-    overflow: "hidden",
+    overflow: "auto",
     boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
     backgroundColor: "#fff",
+    maxHeight: "calc(100vh - 200px)", 
 };
 
 export const tableStyle: React.CSSProperties = {
     width: "100%",
     borderCollapse: "collapse",
+    minWidth: "800px", 
     fontSize: "14px",
 };
 
@@ -212,6 +214,7 @@ export const cellStyle: React.CSSProperties = {
     padding: "16px",
     fontSize: "14px",
     color: "#2D3748",
+    minWidth: "120px"
 };
 
 export const bulkActionsStyle: React.CSSProperties = {
