@@ -49,7 +49,7 @@ VITE_API_BASE_URL=http://localhost:3000
 npm run dev
 ```
 
-Una vez que la aplicación se ejecute, podrás acceder a ella como en el ejemplo. El puerto puede variar según la configuración, pero por defecto se ejecutará en el puerto 3000. Si el puerto está en uso, React te informará de un puerto alternativo donde se está sirviendo la aplicación.
+Una vez que la aplicación se ejecute, podrás acceder a ella como en el ejemplo. El puerto puede variar según la configuración, pero por defecto se ejecutará en el puerto 5173. Si el puerto está en uso, React te informará de un puerto alternativo donde se está sirviendo la aplicación.
 ```
 http://localhost:5173/signin
 ```
