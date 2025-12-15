@@ -1,75 +1,55 @@
-# React + TypeScript + Vite
+# Task Manager
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Task Manager Web es una aplicación web frontend desarrollada en React para gestionar tareas. Permite a los usuarios crear, editar, eliminar y restaurar tareas de manera visual y sencilla. 
 
-Currently, two official plugins are available:
+### Tecnologías utilizadas
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+* React
+* Redux
 
-## React Compiler
+### Requisitos previos
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+* Node.js v24 o superior
+* npm
 
-Note: This will impact Vite dev & build performances.
+### Task Manager API (Importante)
 
-## Expanding the ESLint configuration
+Aunque el frontend de **Task Manager** puede ejecutarse y mostrar la interfaz sin la necesidad de tener **Task Manager API** corriendo, **es imprescindible** para realizar operaciones completas con las tareas (crear, editar, eliminar, restaurar).
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+**Para usar las funcionalidades completas de la aplicación**, necesitarás tener corriendo [**Task Manager API**](https://github.com/holaggabriel/taskmanager-api). Puedes encontrar el código fuente y la documentación allí para configurar y ejecutar la API en tu entorno.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Instalación
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1. Clonar el repositorio:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+   ```
+   git clone <url-del-repo>
+   ```
+2. Ingresar al directorio del proyecto:
+
+   ```
+   cd <carpeta-del-proyecto>
+   ```
+3. Instalar dependencias:
+
+   ```
+   npm install
+   ```
+
+### Configuración de variables de entorno
+
+El frontend necesita conocer la URL de la API (**Task Manager API**). Crear un archivo `.env` a partir del ejemplo.
+Es importante mencionar que el puerto de la API (**Task Manager API**) puede variar dependiendo de tu configuración.
+```
+API_URL=http://localhost:3000/api
+```
+## Ejecutar el proyecto
+
+```
+npm start
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Una vez que la aplicación se ejecute, podrás acceder a ella como en el ejemplo. El puerto puede variar según la configuración, pero por defecto se ejecutará en el puerto 3000. Si el puerto está en uso, React te informará de un puerto alternativo donde se está sirviendo la aplicación.
+```
+http://localhost:5173/
 ```
