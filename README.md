@@ -41,7 +41,7 @@ Aunque el frontend de **Task Manager** puede ejecutarse y mostrar la interfaz si
 El frontend necesita conocer la URL de la API (**Task Manager API**). Crear un archivo `.env` a partir del ejemplo.
 Es importante mencionar que el puerto de la API (**Task Manager API**) puede variar dependiendo de tu configuración.
 ```
-API_URL=http://localhost:3000/api
+VITE_API_BASE_URL=http://localhost:3000
 ```
 ## Ejecutar el proyecto
 
@@ -51,5 +51,5 @@ npm start
 
 Una vez que la aplicación se ejecute, podrás acceder a ella como en el ejemplo. El puerto puede variar según la configuración, pero por defecto se ejecutará en el puerto 3000. Si el puerto está en uso, React te informará de un puerto alternativo donde se está sirviendo la aplicación.
 ```
-http://localhost:5173/
+http://localhost:5173/signin
 ```
