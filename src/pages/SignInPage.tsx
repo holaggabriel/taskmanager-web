@@ -1,8 +1,5 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-
-import { setUser } from '@/redux/userSlice';
 import { authService } from '@/services/authService';
 
 import { Button } from '@/components/ui/button';
@@ -19,7 +16,6 @@ import {
 import { Eye, EyeOff, Mail, Lock, Loader2 } from 'lucide-react';
 
 export default function SignInPage() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [identifier, setIdentifier] = useState('');
