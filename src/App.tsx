@@ -5,8 +5,8 @@ import { store, persistor } from "./redux/store";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 import HomePage from "./pages/HomePage";
-import { ProtectedRoute } from "./components/ProtectedRoute";
-import { PublicRoute } from "./components/PublicRoute";
+import { ProtectedRoute } from "./components/deprecated/ProtectedRoute";
+import { PublicRoute } from "./components/deprecated/PublicRoute";
 import NotFoundPage from "./pages/NotFoundPage"; // Importar la página 404
 
 function App() {

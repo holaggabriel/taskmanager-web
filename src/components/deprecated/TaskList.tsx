@@ -1,17 +1,17 @@
 import { useEffect, useState, useRef } from "react";
-import { taskService } from "../services/taskService";
-import type { Task } from "../types/task";
-import TrashIcon from "../assets/trash.svg";
-import TrashIconFill from "../assets/trash-fill.svg";
-import PlusIcon from "../assets/plus.svg";
+import { taskService } from "../../services/taskService";
+import type { Task } from "../../types/task";
+import TrashIcon from "../../assets/trash.svg";
+import TrashIconFill from "../../assets/trash-fill.svg";
+import PlusIcon from "../../assets/plus.svg";
 import { CreateTaskModal } from "./CreateTaskModal";
 import { EditTaskModal } from "./EditTaskModal";
-import SearchBar from "../components/SearchBar";
-import StatusFilter from "../components/StatusFilter";
-import StatusDropdown from "../components/StatusDropdown";
-import * as styles from "../styles/taskListStyles";
-import ConfirmationModal from "../components/ConfirmationModal";
-import "../styles/animations.css";
+import SearchBar from "../deprecated/SearchBar";
+import StatusFilter from "../deprecated/StatusFilter";
+import StatusDropdown from "../deprecated/StatusDropdown";
+import * as styles from "../../styles/taskListStyles";
+import ConfirmationModal from "../deprecated/ConfirmationModal";
+import "../../styles/animations.css";
 
 interface TaskListProps {
     refreshTrigger?: number;

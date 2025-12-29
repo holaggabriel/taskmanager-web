@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import type { Task } from "../types/task";
-import { taskService } from "../services/taskService";
-import * as styles from "../styles/taskListStyles";
-import EditIcon from "../assets/edit.svg";
+import type { Task } from "../../types/task";
+import { taskService } from "../../services/taskService";
+import * as styles from "../../styles/taskListStyles";
+import EditIcon from "../../assets/edit.svg";
 
 type Props = {
     task: Task;

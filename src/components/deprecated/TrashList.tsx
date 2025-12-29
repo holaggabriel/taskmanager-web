@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { taskService } from "../services/taskService";
-import type { Task } from "../types/task";
-import TrashIcon from "../assets/trash.svg";
-import TrashIconFill from "../assets/trash-fill.svg";
-import RefreshIcon from "../assets/refresh.svg";
-import SearchBar from "../components/SearchBar";
-import StatusFilter from "../components/StatusFilter";
-import * as styles from "../styles/taskListStyles";
-import ConfirmationModal from "../components/ConfirmationModal";
+import { taskService } from "../../services/taskService";
+import type { Task } from "../../types/task";
+import TrashIcon from "../../assets/trash.svg";
+import TrashIconFill from "../../assets/trash-fill.svg";
+import RefreshIcon from "../../assets/refresh.svg";
+import SearchBar from "../deprecated/SearchBar";
+import StatusFilter from "../deprecated/StatusFilter";
+import * as styles from "../../styles/taskListStyles";
+import ConfirmationModal from "../deprecated/ConfirmationModal";
 
 interface TrashListProps {
     refreshTrigger?: number;

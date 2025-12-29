@@ -1,170 +1,161 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { authService } from "../services/authService";
-import {
-  authContainerStyle,
-  authCardStyle,
-  authHeaderStyle,
-  authTitleStyle,
-  authSubtitleStyle,
-  authFormStyle,
-  authInputGroupStyle,
-  authLabelStyle,
-  authInputStyle,
-  authInputWrapperStyle,
-  authButtonStyle,
-  authDividerStyle,
-  authDividerLineStyle,
-  authDividerTextStyle,
-  authFooterStyle,
-  authLinkStyle,
-  errorMessageStyle,
-} from "../styles/taskListStyles";
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
-const SignInPage = () => {
-  const [identifier, setIdentifier] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+import { setUser } from '@/redux/userSlice';
+import { authService } from '@/services/authService';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+
+import { Eye, EyeOff, Mail, Lock, Loader2 } from 'lucide-react';
+
+export default function SignInPage() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    if (identifier.trim() === "" || password.trim() === "") {
-      setError("Por favor, ingresa tu usuario o correo y contraseña");
-      return;
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<{ identifier?: string; password?: string }>({});
+
+  const validateForm = () => {
+    const newErrors: { identifier?: string; password?: string } = {};
+
+    if (!identifier) {
+      newErrors.identifier = 'El email o usuario es requerido';
     }
 
-    setError("");
+    if (!password) {
+      newErrors.password = 'La contraseña es requerida';
+    } else if (password.length < 6) {
+      newErrors.password = 'Mínimo 6 caracteres';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
     setLoading(true);
+    setErrors({});
+
     try {
       const response = await authService.signin({
         identifier: identifier.trim(),
         password: password.trim(),
       });
 
-      if (response.success) {
-        navigate("/home");
-      } else {
-        setError(response.message || "Error al iniciar sesión");
+      if (!response.success) {
+        setErrors({ password: response.message || 'Error al iniciar sesión' });
+        return;
       }
-    } catch (error: any) {
-      console.error(error);
-      setError(
-        error.response?.data?.message || "Error en la conexión con el servidor"
-      );
+
+      // Dispatch user to redux
+      // dispatch(setUser(response.user));
+      navigate('/home');
+    } catch (err: any) {
+      setErrors({ password: err.response?.data?.message || 'Error en la conexión con el servidor' });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleLogin();
-    }
-  };
-
   return (
-    <div style={authContainerStyle}>
-      <div style={authCardStyle}>
-        <div style={authHeaderStyle}>
-          <h1 style={authTitleStyle}>Iniciar Sesión</h1>
-          <p style={authSubtitleStyle}>
-            Ingresa tus credenciales para acceder a tu cuenta
-          </p>
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="w-full max-w-md animate-fade-in">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold tracking-tight">Task Manager</h1>
+          <p className="text-muted-foreground mt-2">Gestiona tus tareas de forma eficiente</p>
         </div>
 
-        {error && (
-          <div style={errorMessageStyle}>
-            {error}
-          </div>
-        )}
+        <Card className="border-border/50 shadow-lg">
+          <CardHeader className="space-y-1 pb-4">
+            <CardTitle className="text-2xl font-semibold">Iniciar Sesión</CardTitle>
+            <CardDescription>
+              Ingresa tus credenciales para acceder
+            </CardDescription>
+          </CardHeader>
 
-        <div style={authFormStyle}>
-          <div style={authInputGroupStyle}>
-            <label style={authLabelStyle}>Usuario o Correo</label>
-            <div style={authInputWrapperStyle}>
-              <input
-                type="text"
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
-                placeholder="usuario@ejemplo.com"
-                style={authInputStyle}
-                onKeyPress={handleKeyPress}
-                disabled={loading}
-              />
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="identifier">Usuario o email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="identifier"
+                    placeholder="usuario o email"
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
+                    className={`pl-10 ${errors.identifier ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                    disabled={loading}
+                  />
+                </div>
+                {errors.identifier && (
+                  <p className="text-sm text-destructive animate-fade-in">{errors.identifier}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">Contraseña</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={`pl-10 pr-10 ${errors.password ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="text-sm text-destructive animate-fade-in">{errors.password}</p>
+                )}
+              </div>
+
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Ingresando...
+                  </>
+                ) : (
+                  'Iniciar Sesión'
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center text-sm">
+              <span className="text-muted-foreground">¿No tienes cuenta? </span>
+              <Link to="/signup" className="font-medium text-primary hover:underline">
+                Regístrate
+              </Link>
             </div>
-          </div>
-
-          <div style={authInputGroupStyle}>
-            <label style={authLabelStyle}>Contraseña</label>
-            <div style={authInputWrapperStyle}>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                style={authInputStyle}
-                onKeyPress={handleKeyPress}
-                disabled={loading}
-              />
-            </div>
-          </div>
-
-          <button
-            onClick={handleLogin}
-            disabled={loading}
-            style={{
-              ...authButtonStyle,
-              opacity: loading ? 0.7 : 1,
-              cursor: loading ? "not-allowed" : "pointer",
-            }}
-            onMouseEnter={(e) => {
-              if (!loading) {
-                e.currentTarget.style.backgroundColor = "#45a049";
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!loading) {
-                e.currentTarget.style.backgroundColor = "#4CAF50";
-              }
-            }}
-          >
-            {loading ? (
-              <>
-                Ingresando...
-              </>
-            ) : (
-              "Iniciar Sesión"
-            )}
-          </button>
-        </div>
-
-        <div style={authDividerStyle}>
-          <div style={authDividerLineStyle} />
-          <span style={authDividerTextStyle}>¿No tienes cuenta?</span>
-          <div style={authDividerLineStyle} />
-        </div>
-
-        <div style={authFooterStyle}>
-          <p>
-            Crea una cuenta{" "}
-            <span
-              style={authLinkStyle}
-              onClick={() => navigate("/signup")}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = "#388e3c";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = "#4CAF50";
-              }}
-            >
-              aquí
-            </span>
-          </p>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
-};
-
-export default SignInPage;
+}

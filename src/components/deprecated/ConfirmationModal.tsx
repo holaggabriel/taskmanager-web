@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import * as styles from "../styles/taskListStyles"; // Ajusta según tu estructura de estilos
+import * as styles from "../../styles/taskListStyles"; // Ajusta según tu estructura de estilos
 
 interface ConfirmationModalProps {
     message: string;

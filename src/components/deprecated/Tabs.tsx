@@ -1,5 +1,5 @@
 import React from "react";
-import * as styles from "../styles/taskListStyles";
+import * as styles from "../../styles/taskListStyles";
 
 interface TabsProps {
     activeTab: "active" | "deleted";

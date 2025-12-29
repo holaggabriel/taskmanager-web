@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import FilterIcon from "../assets/filter.svg";
-import type { Task } from "../types/task";
-import * as styles from "../styles/taskListStyles";
+import FilterIcon from "../../assets/filter.svg";
+import type { Task } from "../../types/task";
+import * as styles from "../../styles/taskListStyles";
 
 interface StatusFilterProps {
     statusFilter: Task["status"] | "all";

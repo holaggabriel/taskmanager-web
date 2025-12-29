@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import type { Task } from "../types/task";
-import { taskService } from "../services/taskService";
-import * as styles from "../styles/taskListStyles";
+import type { Task } from "../../types/task";
+import { taskService } from "../../services/taskService";
+import * as styles from "../../styles/taskListStyles";
 
 type Props = {
     onClose: () => void;

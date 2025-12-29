@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import type { Task } from "../types/task";
+import type { Task } from "../../types/task";
 
 interface StatusDropdownProps {
     taskId: string;

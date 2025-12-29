@@ -1,5 +1,5 @@
-import SearchIcon from "../assets/search.svg";
-import * as styles from "../styles/taskListStyles";
+import SearchIcon from "../../assets/search.svg";
+import * as styles from "../../styles/taskListStyles";
 
 interface SearchBarProps {
     search: string;
