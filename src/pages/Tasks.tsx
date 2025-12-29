@@ -49,7 +49,11 @@ export default function Tasks() {
 
 
   useEffect(() => {
-    loadTasks();
+    const timer = setTimeout(() => {
+      loadTasks();
+    }, 1000);
+
+    return () => clearTimeout(timer); // limpiar el timer si el componente se desmonta
   }, [loadTasks]);
 
 

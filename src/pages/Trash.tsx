@@ -45,7 +45,11 @@ export default function Trash() {
   }, [toast]);
 
   useEffect(() => {
-    loadDeletedTasks();
+    const timer = setTimeout(() => {
+      loadDeletedTasks();
+    }, 1000);
+
+    return () => clearTimeout(timer); // limpia el timer si el componente se desmonta
   }, [loadDeletedTasks]);
 
   const handleRestore = (task: Task) => { setSelectedTask(task); setConfirmAction('restore'); setConfirmOpen(true); };
