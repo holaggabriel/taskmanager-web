@@ -1,4 +1,5 @@
-import { type Task, statusLabels, statusColors } from '@/data/mockTasks';
+import { statusLabels, statusColors } from '@/data/mockTasks';
+import type { Task } from '@/types/task';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {

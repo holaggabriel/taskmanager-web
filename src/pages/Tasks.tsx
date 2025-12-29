@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { mockTasks, type Task } from '@/data/mockTasks';
+import { useState, useEffect, useCallback } from 'react';
+import type { Task } from '@/types/task';
+import { taskService } from '@/services/taskService';
 import MainLayout from '@/components/layout/MainLayout';
 import TaskCard from '@/components/tasks/TaskCard';
 import TaskTable from '@/components/tasks/TaskTable';
@@ -22,35 +23,90 @@ export default function Tasks() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
-    setTimeout(() => {
-      setTasks(mockTasks);
+  const loadTasks = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await taskService.getTasks();
+      if (response.success) {
+        setTasks(response.tasks ?? []);
+      } else {
+        toast({
+          title: 'Error',
+          description: response.message ?? 'No se pudieron cargar las tareas',
+          variant: 'destructive',
+        });
+      }
+    } catch {
+      toast({
+        title: 'Error',
+        description: 'Error de conexión con el servidor',
+        variant: 'destructive',
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
-  }, []);
+    }
+  }, [toast]);
+
+
+  useEffect(() => {
+    loadTasks();
+  }, [loadTasks]);
+
 
   const handleView = (task: Task) => { setSelectedTask(task); setDetailOpen(true); };
   const handleEdit = (task: Task) => { setSelectedTask(task); setFormOpen(true); };
   const handleDelete = (task: Task) => { setSelectedTask(task); setDeleteOpen(true); };
 
-  const confirmDelete = () => {
-    if (selectedTask) {
-      setTasks(tasks.filter(t => t.id !== selectedTask.id));
-      toast({ title: 'Tarea eliminada', description: 'La tarea se movió a la papelera.' });
+  const confirmDelete = async () => {
+    if (!selectedTask) return;
+
+    try {
+      const res = await taskService.softDeleteTaskById(selectedTask.id);
+      if (!res.success) throw new Error(res.message);
+
+      toast({
+        title: 'Tarea eliminada',
+        description: 'La tarea se movió a la papelera.',
+      });
+
+      await loadTasks();
+    } catch {
+      toast({
+        title: 'Error',
+        description: 'No se pudo eliminar la tarea',
+        variant: 'destructive',
+      });
+    } finally {
+      setDeleteOpen(false);
+      setDetailOpen(false);
+      setSelectedTask(null);
     }
-    setDeleteOpen(false);
+
   };
 
-  const handleSave = (taskData: Partial<Task>) => {
-    if (taskData.id) {
-      setTasks(tasks.map(t => t.id === taskData.id ? { ...t, ...taskData } as Task : t));
-      toast({ title: 'Tarea actualizada' });
-    } else {
-      const newTask: Task = { ...taskData, id: Date.now().toString() } as Task;
-      setTasks([newTask, ...tasks]);
-      toast({ title: 'Tarea creada' });
+  const handleSave = async (taskData: Partial<Task>) => {
+
+    try {
+      if (taskData.id) {
+        const res = await taskService.updateTask(taskData.id, taskData);
+        if (!res.success) throw new Error(res.message);
+        toast({ title: 'Tarea actualizada' });
+      } else {
+        const res = await taskService.createTask(taskData);
+        if (!res.success) throw new Error(res.message);
+        toast({ title: 'Tarea creada' });
+      }
+
+      await loadTasks();
+      setFormOpen(false);
+      setSelectedTask(null);
+    } catch {
+      toast({
+        title: 'Error',
+        description: 'No se pudo guardar la tarea',
+        variant: 'destructive',
+      });
     }
-    setSelectedTask(null);
   };
 
   return (
@@ -72,7 +128,7 @@ export default function Tasks() {
 
         {isLoading ? (
           viewMode === 'cards' ? (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{[1,2,3,4,5,6].map(i => <TaskCardSkeleton key={i} />)}</div>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{[1, 2, 3, 4, 5, 6].map(i => <TaskCardSkeleton key={i} />)}</div>
           ) : <TaskTableSkeleton />
         ) : tasks.length === 0 ? (
           <EmptyState title="No hay tareas" description="Crea tu primera tarea para comenzar a organizar tu trabajo." action={<Button onClick={() => setFormOpen(true)}><Plus className="h-4 w-4 mr-2" />Crear Tarea</Button>} />

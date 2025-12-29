@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { mockDeletedTasks, type Task } from '@/data/mockTasks';
+import { useState, useEffect, useCallback } from 'react';
+import type { Task } from '@/types/task';
+import { taskService } from '@/services/taskService';
 import MainLayout from '@/components/layout/MainLayout';
 import TaskCard from '@/components/tasks/TaskCard';
 import TaskTable from '@/components/tasks/TaskTable';
@@ -19,18 +20,72 @@ export default function Trash() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const { toast } = useToast();
 
-  useEffect(() => { setTimeout(() => { setTasks(mockDeletedTasks); setIsLoading(false); }, 800); }, []);
+  const loadDeletedTasks = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const res = await taskService.getDeletedTasks();
+      if (res.success) {
+        setTasks(res.tasks ?? []);
+      } else {
+        toast({
+          title: 'Error',
+          description: res.message ?? 'No se pudieron cargar las tareas eliminadas',
+          variant: 'destructive',
+        });
+      }
+    } catch {
+      toast({
+        title: 'Error',
+        description: 'Error de conexión con el servidor',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    loadDeletedTasks();
+  }, [loadDeletedTasks]);
 
   const handleRestore = (task: Task) => { setSelectedTask(task); setConfirmAction('restore'); setConfirmOpen(true); };
   const handlePermanentDelete = (task: Task) => { setSelectedTask(task); setConfirmAction('delete'); setConfirmOpen(true); };
 
-  const handleConfirm = () => {
-    if (confirmAction === 'restore' && selectedTask) { setTasks(tasks.filter(t => t.id !== selectedTask.id)); toast({ title: 'Tarea restaurada' }); }
-    else if (confirmAction === 'delete' && selectedTask) { setTasks(tasks.filter(t => t.id !== selectedTask.id)); toast({ title: 'Tarea eliminada permanentemente' }); }
-    else if (confirmAction === 'restoreAll') { setTasks([]); toast({ title: 'Todas las tareas restauradas' }); }
-    else if (confirmAction === 'deleteAll') { setTasks([]); toast({ title: 'Papelera vaciada' }); }
-    setConfirmOpen(false);
+  const handleConfirm = async () => {
+    try {
+      if (confirmAction === 'restore' && selectedTask) {
+        await taskService.restoreTaskById(selectedTask.id);
+        toast({ title: 'Tarea restaurada' });
+      }
+
+      if (confirmAction === 'delete' && selectedTask) {
+        await taskService.hardDeleteTaskById(selectedTask.id);
+        toast({ title: 'Tarea eliminada permanentemente' });
+      }
+
+      if (confirmAction === 'restoreAll') {
+        await taskService.restoreAllTasks();
+        toast({ title: 'Todas las tareas restauradas' });
+      }
+
+      if (confirmAction === 'deleteAll') {
+        await taskService.hardDeleteAllTasks();
+        toast({ title: 'Papelera vaciada' });
+      }
+
+      await loadDeletedTasks();
+    } catch {
+      toast({
+        title: 'Error',
+        description: 'No se pudo completar la acción',
+        variant: 'destructive',
+      });
+    } finally {
+      setConfirmOpen(false);
+      setSelectedTask(null);
+    }
   };
+
 
   const confirmTexts = {
     restore: { title: '¿Restaurar tarea?', desc: 'La tarea volverá a tu lista principal.', label: 'Restaurar' },
@@ -56,10 +111,10 @@ export default function Trash() {
           </div>
         </div>
 
-        {isLoading ? <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{[1,2,3].map(i => <TaskCardSkeleton key={i} />)}</div>
-        : tasks.length === 0 ? <EmptyState title="Papelera vacía" description="Las tareas eliminadas aparecerán aquí." />
-        : viewMode === 'cards' ? <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{tasks.map(t => <TaskCard key={t.id} task={t} isTrash onView={() => {}} onEdit={() => {}} onDelete={() => {}} onRestore={handleRestore} onPermanentDelete={handlePermanentDelete} />)}</div>
-        : <TaskTable tasks={tasks} isTrash onView={() => {}} onEdit={() => {}} onDelete={() => {}} onRestore={handleRestore} onPermanentDelete={handlePermanentDelete} />}
+        {isLoading ? <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{[1, 2, 3].map(i => <TaskCardSkeleton key={i} />)}</div>
+          : tasks.length === 0 ? <EmptyState title="Papelera vacía" description="Las tareas eliminadas aparecerán aquí." />
+            : viewMode === 'cards' ? <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{tasks.map(t => <TaskCard key={t.id} task={t} isTrash onView={() => { }} onEdit={() => { }} onDelete={() => { }} onRestore={handleRestore} onPermanentDelete={handlePermanentDelete} />)}</div>
+              : <TaskTable tasks={tasks} isTrash onView={() => { }} onEdit={() => { }} onDelete={() => { }} onRestore={handleRestore} onPermanentDelete={handlePermanentDelete} />}
       </div>
       <ConfirmDialog open={confirmOpen} onOpenChange={setConfirmOpen} title={confirmTexts[confirmAction].title} description={confirmTexts[confirmAction].desc} confirmLabel={confirmTexts[confirmAction].label} variant={confirmAction.includes('delete') ? 'destructive' : 'default'} onConfirm={handleConfirm} />
     </MainLayout>
