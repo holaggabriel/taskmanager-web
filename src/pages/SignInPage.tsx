@@ -61,7 +61,7 @@ export default function SignInPage() {
 
       // Dispatch user to redux
       // dispatch(setUser(response.user));
-      navigate('/home');
+      navigate('/tasks');
     } catch (err: any) {
       setErrors({ password: err.response?.data?.message || 'Error en la conexión con el servidor' });
     } finally {

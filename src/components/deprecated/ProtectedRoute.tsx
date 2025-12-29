@@ -17,7 +17,7 @@ export const ProtectedRoute = ({ children }: Props) => {
 
   useEffect(() => {
     const verifyUser = async () => {
-      if (location.pathname !== "/home") {
+      if (location.pathname !== "/tasks") {
         setLoading(false); // no hacemos fetch en otras rutas
         return;
       }

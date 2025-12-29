@@ -1,4 +1,5 @@
-import { Task, statusLabels, statusColors } from '@/data/mockTasks';
+import type { Task } from '@/data/mockTasks';
+import { statusLabels, statusColors } from '@/data/mockTasks';
 import {
   Dialog,
   DialogContent,

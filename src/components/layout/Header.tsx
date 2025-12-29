@@ -1,7 +1,11 @@
 import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
+import { useSelector, useDispatch } from "react-redux";
+import type { RootState } from "@/redux/store";
+import { clearUser } from "@/redux/userSlice";
+import { useNavigate } from "react-router-dom";
+import { authService } from "@/services/authService";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,10 +23,25 @@ const navItems = [
 ];
 
 export default function Header() {
-  const { user, logout } = useAuth();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const user = useSelector((state: RootState) => state.user.user);
+
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleLogout = async () => {
+  try {
+    await authService.signout();
+    dispatch(clearUser());
+    navigate("/signin");
+  } catch (error) {
+    console.error("Error al cerrar sesión", error);
+  }
+};
+
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -43,11 +62,10 @@ export default function Header() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive
+                className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${isActive
                     ? 'bg-secondary text-foreground'
                     : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-                }`}
+                  }`}
               >
                 <item.icon className="h-4 w-4" />
                 <span>{item.label}</span>
@@ -98,10 +116,14 @@ export default function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logout} className="text-destructive cursor-pointer">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Cerrar Sesión
-                </DropdownMenuItem>
+           <DropdownMenuItem
+  onClick={handleLogout}
+  className="text-destructive cursor-pointer"
+>
+  <LogOut className="mr-2 h-4 w-4" />
+  Cerrar Sesión
+</DropdownMenuItem>
+
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -129,11 +151,10 @@ export default function Header() {
                   key={item.path}
                   to={item.path}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-md text-sm font-medium transition-colors ${
-                    isActive
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-md text-sm font-medium transition-colors ${isActive
                       ? 'bg-secondary text-foreground'
                       : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-                  }`}
+                    }`}
                 >
                   <item.icon className="h-5 w-5" />
                   <span>{item.label}</span>
@@ -147,7 +168,7 @@ export default function Header() {
               </div>
               <button
                 onClick={() => {
-                  logout();
+                  handleLogout();
                   setMobileMenuOpen(false);
                 }}
                 className="flex items-center space-x-3 px-4 py-3 rounded-md text-sm font-medium text-destructive hover:bg-destructive/10 w-full transition-colors"

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Task, TaskStatus, statusLabels } from '@/data/mockTasks';
+import type { Task, TaskStatus } from '@/data/mockTasks';
+import { statusLabels } from '@/data/mockTasks';
 import {
   Dialog,
   DialogContent,
