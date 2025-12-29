@@ -1,4 +1,4 @@
-import { statusLabels, statusColors } from '@/data/mockTasks';
+import { statusLabels, statusColors } from '@/domain/tasks/status';
 import type { Task } from '@/types/task';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
