@@ -39,11 +39,15 @@ export default function Profile() {
           <CardContent className="space-y-4">
             <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
               <Mail className="h-5 w-5 text-muted-foreground" />
-              <div><p className="text-xs text-muted-foreground">Email</p><p className="text-sm font-medium">{user?.email}</p></div>
+              <div><p className="text-xs text-muted-foreground">Correo electrónico</p><p className="text-sm font-medium">{user?.email || "No disponible"}</p></div>
+            </div>
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+              <User className="h-5 w-5 text-muted-foreground" />
+              <div><p className="text-xs text-muted-foreground">Nombre de usuario</p><p className="text-sm font-medium">{user?.username || "No disponible"}</p></div>
             </div>
             <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
               <Calendar className="h-5 w-5 text-muted-foreground" />
-              <div><p className="text-xs text-muted-foreground">Miembro desde</p><p className="text-sm font-medium">{user?.createdAt && format(new Date(user.createdAt), "d 'de' MMMM, yyyy", { locale: es })}</p></div>
+              <div><p className="text-xs text-muted-foreground">Miembro desde</p><p className="text-sm font-medium">{user?.createdAt && format(new Date(user.createdAt), "d 'de' MMMM, yyyy", { locale: es })  || "No disponible"}</p></div>
             </div>
           </CardContent>
         </Card>
