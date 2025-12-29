@@ -1,53 +1,66 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { authService } from "../services/authService";
-import {
-  authContainerStyle,
-  authCardStyle,
-  authHeaderStyle,
-  authTitleStyle,
-  authSubtitleStyle,
-  authFormStyle,
-  authInputGroupStyle,
-  authLabelStyle,
-  authInputStyle,
-  authInputWrapperStyle,
-  authButtonStyle,
-  authDividerStyle,
-  authDividerLineStyle,
-  authDividerTextStyle,
-  authFooterStyle,
-  authLinkStyle,
-  errorMessageStyle,
-  successMessageStyle,
-} from "../styles/taskListStyles";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { authService } from '@/services/authService';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Eye, EyeOff, Mail, Lock, User, Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
-const SignUpPage = () => {
-  const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+export default function SignUpPage() {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const handleSignUp = async () => {
-    if (!name.trim() || !username.trim() || !email.trim() || !password.trim()) {
-      setError("Por favor, completa todos los campos");
-      return;
+  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<{ 
+    name?: string; 
+    username?: string; 
+    email?: string; 
+    password?: string; 
+    confirmPassword?: string 
+  }>({});
+  const [backendMessage, setBackendMessage] = useState<{ message: string; success: boolean } | null>(null);
+  const [accountCreated, setAccountCreated] = useState(false);
+
+  const validateForm = () => {
+    const newErrors: typeof errors = {};
+
+    if (!name.trim()) newErrors.name = 'El nombre es requerido';
+    if (!username.trim()) newErrors.username = 'El nombre de usuario es requerido';
+    
+    if (!email.trim()) {
+      newErrors.email = 'El email es requerido';
+    } else if (!/\S+@\S+\.\S+/.test(email.trim())) {
+      newErrors.email = 'Email inválido';
     }
 
-    // Validación básica de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.trim())) {
-      setError("Por favor, ingresa un correo electrónico válido");
-      return;
+    if (!password.trim()) newErrors.password = 'La contraseña es requerida';
+    
+    if (!confirmPassword.trim()) {
+      newErrors.confirmPassword = 'Confirma tu contraseña';
+    } else if (password.trim() !== confirmPassword.trim()) {
+      newErrors.confirmPassword = 'Las contraseñas no coinciden';
     }
 
-    setError("");
-    setSuccess("");
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
     setLoading(true);
+    setErrors({});
+    setBackendMessage(null);
 
     try {
       const response = await authService.signup({
@@ -58,167 +71,177 @@ const SignUpPage = () => {
       });
 
       if (response.success) {
-        setSuccess("Registro exitoso. Redirigiendo al inicio de sesión...");
-        setTimeout(() => {
-          navigate("/signin");
-        }, 2000);
+        toast({
+          title: '¡Cuenta creada!',
+          description: 'Registro exitoso. Redirigiendo al inicio de sesión...',
+        });
+
+        setAccountCreated(true); // deshabilita el botón
+        setTimeout(() => navigate('/signin'), 2000);
       } else {
-        setError(response.message || "Error al registrarse");
+        setBackendMessage({ message: response.message || 'Error al registrarse', success: false });
+        setLoading(false);
       }
-    } catch (error: any) {
-      console.error(error);
-      setError(
-        error.response?.data?.message || "Error en la conexión con el servidor"
-      );
-    } finally {
+    } catch (err: any) {
+      setBackendMessage({ message: err.response?.data?.message || 'Error en la conexión con el servidor', success: false });
       setLoading(false);
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleSignUp();
-    }
-  };
-
   return (
-    <div style={authContainerStyle}>
-      <div style={authCardStyle}>
-        <div style={authHeaderStyle}>
-          <h1 style={authTitleStyle}>Crear Cuenta</h1>
-          <p style={authSubtitleStyle}>
-            Regístrate para empezar a usar la aplicación
-          </p>
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="w-full max-w-md animate-fade-in">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold tracking-tight">TaskFlow</h1>
+          <p className="text-muted-foreground mt-2">Crea tu cuenta para comenzar</p>
         </div>
 
-        {error && (
-          <div style={errorMessageStyle}>
-            {error}
-          </div>
-        )}
+        <Card className="border-border/50 shadow-lg">
+          <CardHeader className="space-y-1 pb-4">
+            <CardTitle className="text-2xl font-semibold">Registro</CardTitle>
+            <CardDescription>
+              Completa los campos para crear tu cuenta
+            </CardDescription>
+          </CardHeader>
 
-        {success && (
-          <div style={successMessageStyle}>
-            {success}
-          </div>
-        )}
+          <CardContent>
+            <form onSubmit={handleSignUp} className="space-y-4">
+              {/* Nombre */}
+              <div className="space-y-2">
+                <Label htmlFor="name">Nombre</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Tu nombre"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className={`pl-10 ${errors.name ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                    disabled={accountCreated || loading}
+                  />
+                </div>
+                {errors.name && <p className="text-sm text-destructive animate-fade-in">{errors.name}</p>}
+              </div>
 
-        <div style={authFormStyle}>
-          <div style={authInputGroupStyle}>
-            <label style={authLabelStyle}>Nombre Completo</label>
-            <div style={authInputWrapperStyle}>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Juan Pérez"
-                style={authInputStyle}
-                onKeyPress={handleKeyPress}
-                disabled={loading}
-              />
+              {/* Username */}
+              <div className="space-y-2">
+                <Label htmlFor="username">Nombre de Usuario</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="username"
+                    type="text"
+                    placeholder="juanperez"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className={`pl-10 ${errors.username ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                    disabled={accountCreated || loading}
+                  />
+                </div>
+                {errors.username && <p className="text-sm text-destructive animate-fade-in">{errors.username}</p>}
+              </div>
+
+              {/* Email */}
+              <div className="space-y-2">
+                <Label htmlFor="email">Correo Electrónico</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="tu@correo.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className={`pl-10 ${errors.email ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                    disabled={accountCreated || loading}
+                  />
+                </div>
+                {errors.email && <p className="text-sm text-destructive animate-fade-in">{errors.email}</p>}
+              </div>
+
+              {/* Password */}
+              <div className="space-y-2">
+                <Label htmlFor="password">Contraseña</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={`pl-10 pr-10 ${errors.password ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                    disabled={accountCreated || loading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                {errors.password && <p className="text-sm text-destructive animate-fade-in">{errors.password}</p>}
+              </div>
+
+              {/* Confirm Password */}
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirmar Contraseña</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className={`pl-10 pr-10 ${errors.confirmPassword ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                    disabled={accountCreated || loading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                {errors.confirmPassword && <p className="text-sm text-destructive animate-fade-in">{errors.confirmPassword}</p>}
+              </div>
+
+              {/* Botón Crear Cuenta */}
+              <Button type="submit" className="w-full" disabled={accountCreated || loading}>
+                {(loading || accountCreated) ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creando cuenta...
+                  </>
+                ) : (
+                  'Crear Cuenta'
+                )}
+              </Button>
+
+              {/* Mensaje de error del backend */}
+              {backendMessage && !backendMessage.success && (
+                <p className="text-sm animate-fade-in mt-2 text-center text-destructive">
+                  {backendMessage.message}
+                </p>
+              )}
+            </form>
+
+            <div className="mt-6 text-center text-sm">
+              <span className="text-muted-foreground">¿Ya tienes cuenta? </span>
+              <span
+                className="font-medium text-primary hover:underline cursor-pointer"
+                onClick={() => navigate('/signin')}
+              >
+                Inicia sesión
+              </span>
             </div>
-          </div>
-
-          <div style={authInputGroupStyle}>
-            <label style={authLabelStyle}>Nombre de Usuario</label>
-            <div style={authInputWrapperStyle}>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="juanperez"
-                style={authInputStyle}
-                onKeyPress={handleKeyPress}
-                disabled={loading}
-              />
-            </div>
-          </div>
-
-          <div style={authInputGroupStyle}>
-            <label style={authLabelStyle}>Correo Electrónico</label>
-            <div style={authInputWrapperStyle}>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="tu@correo.com"
-                style={authInputStyle}
-                onKeyPress={handleKeyPress}
-                disabled={loading}
-              />
-            </div>
-          </div>
-
-          <div style={authInputGroupStyle}>
-            <label style={authLabelStyle}>Contraseña</label>
-            <div style={authInputWrapperStyle}>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                style={authInputStyle}
-                onKeyPress={handleKeyPress}
-                disabled={loading}
-              />
-            </div>
-          </div>
-
-          <button
-            onClick={handleSignUp}
-            disabled={loading}
-            style={{
-              ...authButtonStyle,
-              opacity: loading ? 0.7 : 1,
-              cursor: loading ? "not-allowed" : "pointer",
-            }}
-            onMouseEnter={(e) => {
-              if (!loading) {
-                e.currentTarget.style.backgroundColor = "#45a049";
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!loading) {
-                e.currentTarget.style.backgroundColor = "#4CAF50";
-              }
-            }}
-          >
-            {loading ? (
-              <>
-                Registrando...
-              </>
-            ) : (
-              "Crear Cuenta"
-            )}
-          </button>
-        </div>
-
-        <div style={authDividerStyle}>
-          <div style={authDividerLineStyle} />
-          <span style={authDividerTextStyle}>¿Ya tienes cuenta?</span>
-          <div style={authDividerLineStyle} />
-        </div>
-
-        <div style={authFooterStyle}>
-          <p>
-            Inicia sesión{" "}
-            <span
-              style={authLinkStyle}
-              onClick={() => navigate("/signin")}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = "#388e3c";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = "#4CAF50";
-              }}
-            >
-              aquí
-            </span>
-          </p>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
-};
-
-export default SignUpPage;
+}

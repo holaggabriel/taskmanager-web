@@ -8,12 +8,17 @@ import HomePage from "./pages/HomePage";
 import { ProtectedRoute } from "./components/deprecated/ProtectedRoute";
 import { PublicRoute } from "./components/deprecated/PublicRoute";
 import NotFoundPage from "./pages/NotFoundPage"; // Importar la página 404
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
 
 function App() {
   return (
     <Provider store={store}>
       <PersistGate loading={<p>Cargando...</p>} persistor={persistor}>
         <BrowserRouter>
+          <Toaster />
+          <Sonner />
+
           <Routes>
             <Route
               path="/signin"
@@ -39,7 +44,6 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            {/* Ruta comodín para mostrar la página 404 */}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </BrowserRouter>
