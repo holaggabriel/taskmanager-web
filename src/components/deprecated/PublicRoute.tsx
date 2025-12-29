@@ -8,6 +8,6 @@ interface Props { children: JSX.Element; }
 
 export const PublicRoute = ({ children }: Props) => {
   const { user } = useSelector((state: RootState) => state.user);
-  if (user) return <Navigate to="/home" />;
+  if (user) return <Navigate to="/tasks" />;
   return children;
 };
