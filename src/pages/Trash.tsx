@@ -47,7 +47,7 @@ export default function Trash() {
   useEffect(() => {
     const timer = setTimeout(() => {
       loadDeletedTasks();
-    }, 1000);
+    }, 800);
 
     return () => clearTimeout(timer); // limpia el timer si el componente se desmonta
   }, [loadDeletedTasks]);
