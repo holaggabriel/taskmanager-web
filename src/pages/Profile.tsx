@@ -1,14 +1,30 @@
 import type { RootState } from '@/redux/store';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import MainLayout from '@/components/layout/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, Mail, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { userService } from "../services/userService";
+import { useEffect } from 'react';
+import { setUser } from "../redux/userSlice";
 
 export default function Profile() {
-    const user = useSelector((state: RootState) => state.user.user);
+  const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.user.user);
 
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await userService.getMyData();
+        if (res.success && res.user) dispatch(setUser(res.user));
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchUser();
+  }, [dispatch]);
   return (
     <MainLayout>
       <div className="max-w-2xl mx-auto space-y-6">

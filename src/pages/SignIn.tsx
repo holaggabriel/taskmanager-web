@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '@/services/authService';
-
+import { userService } from "../services/userService";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Eye, EyeOff, Mail, Lock, Loader2 } from 'lucide-react';
+import { useDispatch } from 'react-redux';
+import { setUser } from "../redux/userSlice";
 import {
   Card,
   CardContent,
@@ -13,10 +16,9 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-import { Eye, EyeOff, Mail, Lock, Loader2 } from 'lucide-react';
-
 export default function SignInPage() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -49,6 +51,7 @@ export default function SignInPage() {
     setErrors({});
 
     try {
+      // 1. Intentamos autenticar al usuario
       const response = await authService.signin({
         identifier: identifier.trim(),
         password: password.trim(),
@@ -59,15 +62,25 @@ export default function SignInPage() {
         return;
       }
 
-      // Dispatch user to redux
-      // dispatch(setUser(response.user));
-      navigate('/tasks');
+      // 2. Obtener los datos del usuario después de iniciar sesión
+      try {
+        const userData = await userService.getMyData();
+        if (userData.success && userData.user) {
+          dispatch(setUser(userData.user)); // Guardar usuario en Redux
+          navigate('/tasks');               // Redirigir después de poblar Redux
+        } else {
+          setErrors({ password: 'No se pudieron obtener los datos del usuario' });
+        }
+      } catch (err) {
+        setErrors({ password: 'Error al obtener datos del usuario' });
+      }
     } catch (err: any) {
       setErrors({ password: err.response?.data?.message || 'Error en la conexión con el servidor' });
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
