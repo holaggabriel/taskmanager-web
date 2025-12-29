@@ -2,10 +2,10 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Navigate, useLocation } from "react-router-dom";
-import { setUser, clearUser } from "../../redux/userSlice";
-import { userService } from "../../services/userService";
+import { setUser, clearUser } from "../redux/userSlice";
+import { userService } from "../services/userService";
 import type { JSX } from "react/jsx-runtime";
-import type { RootState } from "../../redux/store";
+import type { RootState } from "../redux/store";
 
 interface Props { children: JSX.Element; }
 

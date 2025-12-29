@@ -5,9 +5,9 @@ import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "@/redux/store";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 
-import { routes } from "@/router";
-import { ProtectedRoute } from "@/components/deprecated/ProtectedRoute";
-import { PublicRoute } from "@/components/deprecated/PublicRoute";
+import { routes } from "@/routes/router";
+import { ProtectedRoute } from "@/routes/ProtectedRoute";
+import { PublicRoute } from "@/routes/PublicRoute";
 
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
