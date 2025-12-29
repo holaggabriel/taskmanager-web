@@ -1,4 +1,5 @@
-import { useAuth } from '@/contexts/AuthContext';
+import type { RootState } from '@/redux/store';
+import { useSelector } from 'react-redux';
 import MainLayout from '@/components/layout/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, Mail, Calendar } from 'lucide-react';
@@ -6,7 +7,7 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 export default function Profile() {
-  const { user } = useAuth();
+    const user = useSelector((state: RootState) => state.user.user);
 
   return (
     <MainLayout>
