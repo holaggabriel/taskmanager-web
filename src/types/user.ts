@@ -2,5 +2,5 @@ export interface User {
   username: string;
   name: string;
   email: string;
-  createdAt: Date;
+  created_at: string;
 }

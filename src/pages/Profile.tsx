@@ -47,7 +47,7 @@ export default function Profile() {
             </div>
             <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
               <Calendar className="h-5 w-5 text-muted-foreground" />
-              <div><p className="text-xs text-muted-foreground">Miembro desde</p><p className="text-sm font-medium">{user?.createdAt && format(new Date(user.createdAt), "d 'de' MMMM, yyyy", { locale: es })  || "No disponible"}</p></div>
+              <div><p className="text-xs text-muted-foreground">Miembro desde</p><p className="text-sm font-medium">{user?.created_at && format(new Date(user.created_at), "d 'de' MMMM, yyyy", { locale: es })  || "No disponible"}</p></div>
             </div>
           </CardContent>
         </Card>
