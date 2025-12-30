@@ -25,6 +25,7 @@ export default function Profile() {
 
     fetchUser();
   }, [dispatch]);
+  
   return (
     <MainLayout>
       <div className="max-w-2xl mx-auto space-y-6">

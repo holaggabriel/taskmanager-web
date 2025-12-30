@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Eye, EyeOff, Mail, Lock, Loader2 } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { setUser } from "../redux/userSlice";
+import { delay } from "@/lib/utils"
 import {
   Card,
   CardContent,
@@ -43,44 +44,46 @@ export default function SignInPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!validateForm()) return;
 
-    setLoading(true);
-    setErrors({});
+  setLoading(true);
+  setErrors({});
 
-    try {
-      // 1. Intentamos autenticar al usuario
-      const response = await authService.signin({
-        identifier: identifier.trim(),
-        password: password.trim(),
-      });
+  try {
+    await delay(800);
 
-      if (!response.success) {
-        setErrors({ password: response.message || 'Error al iniciar sesión' });
-        return;
-      }
+    // 1. Intentamos autenticar al usuario
+    const response = await authService.signin({
+      identifier: identifier.trim(),
+      password: password.trim(),
+    });
 
-      // 2. Obtener los datos del usuario después de iniciar sesión
-      try {
-        const userData = await userService.getMyData();
-        if (userData.success && userData.user) {
-          dispatch(setUser(userData.user)); // Guardar usuario en Redux
-          navigate('/tasks');               // Redirigir después de poblar Redux
-        } else {
-          setErrors({ password: 'No se pudieron obtener los datos del usuario' });
-        }
-      } catch (err) {
-        setErrors({ password: 'Error al obtener datos del usuario' });
-      }
-    } catch (err: any) {
-      setErrors({ password: err.response?.data?.message || 'Error en la conexión con el servidor' });
-    } finally {
-      setLoading(false);
+    if (!response.success) {
+      setErrors({ password: response.message || 'Error al iniciar sesión' });
+      return;
     }
-  };
 
+    // 2. Obtener los datos del usuario después de iniciar sesión
+    try {
+
+      const userData = await userService.getMyData();
+      if (userData.success && userData.user) {
+        dispatch(setUser(userData.user)); // Guardar usuario en Redux
+        navigate('/tasks');               // Redirigir después de poblar Redux
+      } else {
+        setErrors({ password: 'No se pudieron obtener los datos del usuario' });
+      }
+    } catch (err) {
+      setErrors({ password: 'Error al obtener datos del usuario' });
+    }
+  } catch (err: any) {
+    setErrors({ password: err.response?.data?.message || 'Error en la conexión con el servidor' });
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
