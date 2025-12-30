@@ -1,8 +1,7 @@
-import { statusLabels, statusColors } from '@/domain/tasks/status';
 import type { Task } from '@/types/task';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { StatusBadge } from '@/components/tasks/StatusBadge';
 import { Eye, Pencil, Trash2, RotateCcw, Trash } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -33,12 +32,7 @@ export default function TaskCard({
           <h3 className="font-semibold text-lg leading-tight line-clamp-2">
             {task.title}
           </h3>
-          <Badge
-            variant="outline"
-            className={`shrink-0 ${statusColors[task.status]}`}
-          >
-            {statusLabels[task.status]}
-          </Badge>
+                   <StatusBadge status={task.status} />
         </div>
       </CardHeader>
       <CardContent className="pb-3">

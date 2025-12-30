@@ -1,7 +1,6 @@
-import { statusLabels, statusColors } from '@/domain/tasks/status';
 import type { Task } from '@/types/task';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { StatusBadge } from '@/components/tasks/StatusBadge';
 import {
   Table,
   TableBody,
@@ -57,12 +56,7 @@ export default function TaskTable({
                 </span>
               </TableCell>
               <TableCell>
-                <Badge
-                  variant="outline"
-                  className={`${statusColors[task.status]}`}
-                >
-                  {statusLabels[task.status]}
-                </Badge>
+  <StatusBadge status={task.status} />
               </TableCell>
               <TableCell className="hidden sm:table-cell text-muted-foreground text-sm">
                 {format(new Date(task.createdAt), "d MMM, yyyy", { locale: es })}
