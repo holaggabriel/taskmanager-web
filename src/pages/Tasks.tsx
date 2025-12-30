@@ -23,34 +23,41 @@ export default function Tasks() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const { toast } = useToast();
 
-  const loadTasks = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const response = await taskService.getTasks();
-      if (response.success) {
-        setTasks(response.tasks ?? []);
-      } else {
+  const loadTasks = useCallback(
+    async (showSkeleton: boolean = false) => {
+      if (showSkeleton) {
+        setIsLoading(true);
+      }
+
+      try {
+        const response = await taskService.getTasks();
+        if (response.success) {
+          setTasks(response.tasks ?? []);
+        } else {
+          toast({
+            title: 'Error',
+            description: response.message ?? 'No se pudieron cargar las tareas',
+            variant: 'destructive',
+          });
+        }
+      } catch {
         toast({
           title: 'Error',
-          description: response.message ?? 'No se pudieron cargar las tareas',
+          description: 'Error de conexión con el servidor',
           variant: 'destructive',
         });
+      } finally {
+        if (showSkeleton) {
+          setIsLoading(false);
+        }
       }
-    } catch {
-      toast({
-        title: 'Error',
-        description: 'Error de conexión con el servidor',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [toast]);
-
+    },
+    [toast]
+  );
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      loadTasks();
+      loadTasks(true);
     }, 800);
 
     return () => clearTimeout(timer); // limpiar el timer si el componente se desmonta

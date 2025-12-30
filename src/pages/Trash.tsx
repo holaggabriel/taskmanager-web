@@ -20,33 +20,41 @@ export default function Trash() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const { toast } = useToast();
 
-  const loadDeletedTasks = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const res = await taskService.getDeletedTasks();
-      if (res.success) {
-        setTasks(res.tasks ?? []);
-      } else {
+  const loadDeletedTasks = useCallback(
+    async (showSkeleton: boolean = false) => {
+      if (showSkeleton) {
+        setIsLoading(true);
+      }
+
+      try {
+        const res = await taskService.getDeletedTasks();
+        if (res.success) {
+          setTasks(res.tasks ?? []);
+        } else {
+          toast({
+            title: 'Error',
+            description: res.message ?? 'No se pudieron cargar las tareas eliminadas',
+            variant: 'destructive',
+          });
+        }
+      } catch {
         toast({
           title: 'Error',
-          description: res.message ?? 'No se pudieron cargar las tareas eliminadas',
+          description: 'Error de conexión con el servidor',
           variant: 'destructive',
         });
+      } finally {
+        if (showSkeleton) {
+          setIsLoading(false);
+        }
       }
-    } catch {
-      toast({
-        title: 'Error',
-        description: 'Error de conexión con el servidor',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [toast]);
+    },
+    [toast]
+  );
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      loadDeletedTasks();
+      loadDeletedTasks(true);
     }, 800);
 
     return () => clearTimeout(timer); // limpia el timer si el componente se desmonta
