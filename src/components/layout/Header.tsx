@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { CheckSquare, Trash2, User, Sun, Moon, LogOut, Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import { APP_NAME } from '@/constants/appconfig';
 
 const navItems = [
   { path: '/tasks', label: 'Tareas', icon: CheckSquare },
@@ -51,7 +52,7 @@ export default function Header() {
           <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
             <CheckSquare className="h-5 w-5 text-primary-foreground" />
           </div>
-          <span className="font-bold text-xl hidden sm:inline-block">TaskFlow</span>
+          <span className="font-bold text-xl hidden sm:inline-block">{APP_NAME}</span>
         </Link>
 
         {/* Desktop Navigation */}
