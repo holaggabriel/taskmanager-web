@@ -16,6 +16,8 @@ import {
 import { CheckSquare, Trash2, User, Sun, Moon, LogOut, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { APP_NAME } from '@/constants/appconfig';
+import ConfirmDialog from '@/components/common/ConfirmDialog';
+import { delay } from "@/lib/utils"
 
 const navItems = [
   { path: '/tasks', label: 'Tareas', icon: CheckSquare },
@@ -26,6 +28,7 @@ const navItems = [
 export default function Header() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
   const user = useSelector((state: RootState) => state.user.user);
 
@@ -33,16 +36,23 @@ export default function Header() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleLogout = async () => {
-  try {
-    await authService.signout();
-    dispatch(clearUser());
-    navigate("/signin");
-  } catch (error) {
-    console.error("Error al cerrar sesión", error);
-  }
-};
+  const handleLogoutClick = () => {
+    setLogoutConfirmOpen(true);
+  };
 
+
+  const handleConfirmLogout = async () => {
+    try {
+      await delay(200)
+      await authService.signout();
+      dispatch(clearUser());
+      navigate("/signin");
+    } catch (error) {
+      console.error("Error al cerrar sesión", error);
+    } finally {
+      setLogoutConfirmOpen(false);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -64,8 +74,8 @@ export default function Header() {
                 key={item.path}
                 to={item.path}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${isActive
-                    ? 'bg-secondary text-foreground'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+                  ? 'bg-secondary text-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
                   }`}
               >
                 <item.icon className="h-4 w-4" />
@@ -117,13 +127,13 @@ export default function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-           <DropdownMenuItem
-  onClick={handleLogout}
-  className="text-destructive cursor-pointer"
->
-  <LogOut className="mr-2 h-4 w-4" />
-  Cerrar Sesión
-</DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleLogoutClick}
+                  className="text-destructive cursor-pointer"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Cerrar Sesión
+                </DropdownMenuItem>
 
               </DropdownMenuContent>
             </DropdownMenu>
@@ -153,8 +163,8 @@ export default function Header() {
                   to={item.path}
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center space-x-3 px-4 py-3 rounded-md text-sm font-medium transition-colors ${isActive
-                      ? 'bg-secondary text-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+                    ? 'bg-secondary text-foreground'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
                     }`}
                 >
                   <item.icon className="h-5 w-5" />
@@ -169,7 +179,7 @@ export default function Header() {
               </div>
               <button
                 onClick={() => {
-                  handleLogout();
+                  handleLogoutClick();
                   setMobileMenuOpen(false);
                 }}
                 className="flex items-center space-x-3 px-4 py-3 rounded-md text-sm font-medium text-destructive hover:bg-destructive/10 w-full transition-colors"
@@ -181,6 +191,17 @@ export default function Header() {
           </nav>
         </div>
       )}
+
+      <ConfirmDialog
+        open={logoutConfirmOpen}
+        onOpenChange={setLogoutConfirmOpen}
+        title="¿Cerrar sesión?"
+        description="No tendrás acceso a las funciones hasta que vuelvas a iniciar sesión."
+        confirmLabel="Cerrar sesión"
+        variant="destructive"
+        onConfirm={handleConfirmLogout}
+      />
+
     </header>
   );
 }
