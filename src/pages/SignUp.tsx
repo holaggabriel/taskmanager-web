@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, EyeOff, Mail, Lock, User, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { APP_NAME } from '@/constants/appconfig';
 
 export default function SignUpPage() {
   const navigate = useNavigate();
@@ -20,12 +21,12 @@ export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{ 
-    name?: string; 
-    username?: string; 
-    email?: string; 
-    password?: string; 
-    confirmPassword?: string 
+  const [errors, setErrors] = useState<{
+    name?: string;
+    username?: string;
+    email?: string;
+    password?: string;
+    confirmPassword?: string
   }>({});
   const [backendMessage, setBackendMessage] = useState<{ message: string; success: boolean } | null>(null);
   const [accountCreated, setAccountCreated] = useState(false);
@@ -35,7 +36,7 @@ export default function SignUpPage() {
 
     if (!name.trim()) newErrors.name = 'El nombre es requerido';
     if (!username.trim()) newErrors.username = 'El nombre de usuario es requerido';
-    
+
     if (!email.trim()) {
       newErrors.email = 'El email es requerido';
     } else if (!/\S+@\S+\.\S+/.test(email.trim())) {
@@ -43,7 +44,7 @@ export default function SignUpPage() {
     }
 
     if (!password.trim()) newErrors.password = 'La contraseña es requerida';
-    
+
     if (!confirmPassword.trim()) {
       newErrors.confirmPassword = 'Confirma tu contraseña';
     } else if (password.trim() !== confirmPassword.trim()) {
@@ -92,7 +93,7 @@ export default function SignUpPage() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-md animate-fade-in">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">TaskFlow</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{APP_NAME}</h1>
           <p className="text-muted-foreground mt-2">Crea tu cuenta para comenzar</p>
         </div>
 
