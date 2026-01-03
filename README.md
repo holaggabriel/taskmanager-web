@@ -2,6 +2,8 @@
 
 Task Manager Web es una aplicación web frontend desarrollada en React para gestionar tareas. Permite a los usuarios crear, editar, eliminar y restaurar tareas de manera visual y sencilla. 
 
+https://github.com/user-attachments/assets/8f8024fe-c3d0-4fdc-b6bf-fb76a3ef1f15
+
 ### Tecnologías utilizadas
 
 * React
@@ -53,5 +55,3 @@ Una vez que la aplicación se ejecute, podrás acceder a ella como en el ejemplo
 ```
 http://localhost:5173/signin
 ```
-## Demostración
-https://github.com/user-attachments/assets/706530ad-2a31-4a69-86ee-05fe0564f3fa
